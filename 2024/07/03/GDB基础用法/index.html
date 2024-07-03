@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="Zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"panmaru.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言这篇博客是一篇笔记，可能有许多不严谨的地方 环境准备 安装好必要的编译工具以及GDB 新建一个名为test.c的文件，将下面一串C程序粘贴进去：12345678910111213141516171819int actual_calc(int a, int b)&#123;  int c;  c&#x3D;a&#x2F;b;  return 0;&#125;int calc()&#123;  int a;  int">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GDB基础用法">
+<meta property="og:url" content="http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/index.html">
+<meta property="og:site_name" content="Pam_ma_ru&#39;s Blog">
+<meta property="og:description" content="前言这篇博客是一篇笔记，可能有许多不严谨的地方 环境准备 安装好必要的编译工具以及GDB 新建一个名为test.c的文件，将下面一串C程序粘贴进去：12345678910111213141516171819int actual_calc(int a, int b)&#123;  int c;  c&#x3D;a&#x2F;b;  return 0;&#125;int calc()&#123;  int a;  int">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/gcc%E7%9A%84-ggdb%E9%80%89%E9%A1%B9.png">
+<meta property="article:published_time" content="2024-07-03T09:05:45.000Z">
+<meta property="article:modified_time" content="2024-07-03T12:25:55.045Z">
+<meta property="article:author" content="Pan_ma_ru">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/gcc%E7%9A%84-ggdb%E9%80%89%E9%A1%B9.png">
+
+
+<link rel="canonical" href="http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"Zh-CN","comments":true,"permalink":"http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/","path":"2024/07/03/GDB基础用法/","title":"GDB基础用法"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GDB基础用法 | Pam_ma_ru's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Pam_ma_ru's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C%E7%A8%8B%E5%BA%8F%E5%B9%B6%E5%BE%97%E5%88%B0core%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">编译运行程序并得到core文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8GDB%E5%88%86%E6%9E%90core-dump"><span class="nav-number">4.</span> <span class="nav-text">使用GDB分析core dump</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#backtrace"><span class="nav-number">5.</span> <span class="nav-text">backtrace</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E6%A0%88%E5%B8%A7"><span class="nav-number">6.</span> <span class="nav-text">观察栈帧</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Pan_ma_ru</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="Zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://panmaru.github.io/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Pan_ma_ru">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GDB基础用法 | Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GDB基础用法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-07-03 17:05:45 / Modified: 20:25:55" itemprop="dateCreated datePublished" datetime="2024-07-03T17:05:45+08:00">2024-07-03</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这篇博客是一篇笔记，可能有许多不严谨的地方</p>
+<h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><ol>
+<li>安装好必要的编译工具以及GDB</li>
+<li>新建一个名为<code>test.c</code>的文件，将下面一串C程序粘贴进去：<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">actual_calc</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span>&#123;</span><br><span class="line">  <span class="type">int</span> c;</span><br><span class="line">  c=a/b;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">calc</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="type">int</span> a;</span><br><span class="line">  <span class="type">int</span> b;</span><br><span class="line">  a=<span class="number">13</span>;</span><br><span class="line">  b=<span class="number">0</span>;</span><br><span class="line">  actual_calc(a, b);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">  calc();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="编译运行程序并得到core文件"><a href="#编译运行程序并得到core文件" class="headerlink" title="编译运行程序并得到core文件"></a>编译运行程序并得到core文件</h1><p>使用<code>gcc</code>编译<code>test.c</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc -ggdb test.c -o test.out</span><br></pre></td></tr></table></figure>
+
+<p><code>-ggdb</code>选项用来生成调试信息，需要注意的是<code>-g</code>同样也会生成调试信息，但<code>-g</code>利用操作系统的<strong>原生格式</strong>（native format）生成调试信息，可以被GDB以及其他调试器利用；而<code>-ggdb</code>为GDB专门生成了更丰富的调试信息，只能使用DDB调试<br><img src="/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/gcc%E7%9A%84-ggdb%E9%80%89%E9%A1%B9.png" alt="gcc的-ggdb选项"></p>
+<p>成功编译，尝试运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">ls</span></span><br><span class="line">test.c  test.out</span><br><span class="line">$ ./test.out </span><br><span class="line">[1]    6209 floating point exception (core dumped)  ./test.out</span><br></pre></td></tr></table></figure>
+
+<p>执行下面的脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ! grep -qi <span class="string">&#x27;kernel.core_pattern&#x27;</span> /etc/sysctl.conf; <span class="keyword">then</span></span><br><span class="line">  sudo sh -c <span class="string">&#x27;echo &quot;kernel.core_pattern=core.%p.%u.%s.%e.%t&quot; &gt;&gt; /etc/sysctl.conf&#x27;</span></span><br><span class="line">  sudo sysctl -p</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">ulimit</span> -c unlimited</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>上面的脚本会尝试往<code>/etc/sysctl.conf</code>中插入一行来更改core dump文件的命名格式（可以通过<code>man core</code>进一步了解）并且立即应用更改，然后将core文件的大小限制取消</p>
+<p>再次运行程序，发现在当前目录下生成了一个core dump文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ./test.out</span><br><span class="line">[1]    17272 floating point exception (core dumped)  ./test.out</span><br><span class="line">$ <span class="built_in">ls</span></span><br><span class="line">core.17272.1000.8.test.out.1720005845  test.c  test.out</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>使用<code>file</code>分析这个文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ file core.17272.1000.8.test.out.1720005845 </span><br><span class="line">core.17272.1000.8.test.out.1720005845: ELF 64-bit LSB core file, x86-64, version 1 (SYSV), SVR4-style, from <span class="string">&#x27;./test.out&#x27;</span>, real uid: 1000, effective uid: 1000, real gid: 1000, effective gid: 1000, execfn: <span class="string">&#x27;./test.out&#x27;</span>, platform: <span class="string">&#x27;x86_64&#x27;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以知道这是一个64位的core，UID是1000，使用的是<code>x86_64</code>平台，运行的程序是<code>./test.out</code>，从<code>.8.</code>中还能得知信号8结束了程序，通过<code>signal(7)</code>的手册得知这个信号是<code>SIGFPE</code>，是<code>Floating-point exception</code></p>
+<h1 id="使用GDB分析core-dump"><a href="#使用GDB分析core-dump" class="headerlink" title="使用GDB分析core dump"></a>使用GDB分析core dump</h1><p>运行<code>gdb</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">$ gdb ./test.out ./core.17272.1000.8.test.out.1720005845 </span><br><span class="line">GNU gdb (GDB) 14.2</span><br><span class="line">Copyright (C) 2023 Free Software Foundation, Inc.</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">Reading symbols from ./test.out...</span><br><span class="line">[New LWP 17272]</span><br><span class="line">[Thread debugging using libthread_db enabled]</span><br><span class="line">Using host libthread_db library <span class="string">&quot;/usr/lib/libthread_db.so.1&quot;</span>.</span><br><span class="line">Core was generated by `./test.out<span class="string">&#x27;.</span></span><br><span class="line"><span class="string">Program terminated with signal SIGFPE, Arithmetic exception.</span></span><br><span class="line"><span class="string">#0  0x00005f2c39451127 in actual_calc (a=13, b=0) at test.c:3</span></span><br><span class="line"><span class="string">3         c=a/b;</span></span><br><span class="line"><span class="string">(gdb) </span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure>
+
+<p>GDB告诉我core由<code>./test.out</code>产生并且信号是<code>SIGFPE</code>，属于<code>Arithmetic exception</code>；我们还能知道错误的详细信息，包括地址、函数名、变量名以及错误发生的行号</p>
+<h1 id="backtrace"><a href="#backtrace" class="headerlink" title="backtrace"></a>backtrace</h1><p>使用指令<code>bt</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(gdb) bt</span><br><span class="line"><span class="comment">#0  0x00005f2c39451127 in actual_calc (a=13, b=0) at test.c:3</span></span><br><span class="line"><span class="comment">#1  0x00005f2c39451159 in calc () at test.c:12</span></span><br><span class="line"><span class="comment">#2  0x00005f2c3945116e in main () at test.c:17</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>bt</code>是<code>backtrace</code>的缩写，从结果可以看到一个“倒着的”函数调用过程，那些形如<code>#0</code>的东西是<strong>栈帧</strong>（Stack Frame）编号</p>
+<h1 id="观察栈帧"><a href="#观察栈帧" class="headerlink" title="观察栈帧"></a>观察栈帧</h1><p>可以观察某一个栈帧:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(gdb) f 2</span><br><span class="line"><span class="comment">#2  0x00005f2c3945116e in main () at test.c:17</span></span><br><span class="line">17        calc();</span><br><span class="line">(gdb) list</span><br><span class="line">12        actual_calc(a, b);</span><br><span class="line">13        <span class="built_in">return</span> 0;</span><br><span class="line">14      &#125;</span><br><span class="line">15</span><br><span class="line">16      int <span class="function"><span class="title">main</span></span>()&#123;</span><br><span class="line">17        calc();</span><br><span class="line">18        <span class="built_in">return</span> 0;</span><br><span class="line">19      &#125;</span><br><span class="line">(gdb) p a</span><br><span class="line">No symbol <span class="string">&quot;a&quot;</span> <span class="keyword">in</span> current context.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>f 2</code>表示跳入到<code>#2</code>栈帧，<code>f</code>是<code>frame</code>的缩写；<code>list</code>可以展示程序的源代码；<code>p a</code>表示尝试打印变量<code>a</code>的值（失败因为<code>main()</code>没有定义<code>a</code>）,<code>p</code>是<code>print</code>的缩写</p>
+<p>可以继续检查<code>#1</code>栈帧</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">(gdb) f 1</span><br><span class="line"><span class="comment">#1  0x00005f2c39451159 in calc () at test.c:12</span></span><br><span class="line">12        actual_calc(a, b);</span><br><span class="line">(gdb) list</span><br><span class="line">7       int <span class="function"><span class="title">calc</span></span>()&#123;</span><br><span class="line">8         int a;</span><br><span class="line">9         int b;</span><br><span class="line">10        a=13;</span><br><span class="line">11        b=0;</span><br><span class="line">12        actual_calc(a, b);</span><br><span class="line">13        <span class="built_in">return</span> 0;</span><br><span class="line">14      &#125;</span><br><span class="line">15</span><br><span class="line">16      int <span class="function"><span class="title">main</span></span>()&#123;</span><br><span class="line">(gdb) p a</span><br><span class="line"><span class="variable">$1</span> = 13</span><br><span class="line">(gdb) p b</span><br><span class="line"><span class="variable">$2</span> = 0</span><br><span class="line">(gdb) p c</span><br><span class="line">No symbol <span class="string">&quot;c&quot;</span> <span class="keyword">in</span> current context.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://linuxconfig.org/gdb-debugging-tutorial-for-beginners">GDB debugging tutorial for beginners</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/07/02/Makefile%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/" rel="prev" title="Makefile基础用法">
+                  <i class="fa fa-angle-left"></i> Makefile基础用法
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Pan_ma_ru</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
