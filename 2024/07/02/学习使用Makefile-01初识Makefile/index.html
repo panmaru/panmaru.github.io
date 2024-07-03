@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="Zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha256-XOqroi11tY4EFQMR9ZYwZWKj5ZXiftSx36RRuC3anlA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"panmaru.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.20.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="前言这篇博客是一篇笔记，可能有许多不严谨的地方 我学习过程中使用的环境是Arch Linux x86_64，使用的编译器为gcc (GCC) 14.1.1，make版本为GNU Make 4.4.1 什么是Make、Makefile先来看看维基百科关于Make的解释：  In software development, Make is a command-line interface (CLI)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习使用Makefile-01初识Makefile">
+<meta property="og:url" content="http://panmaru.github.io/2024/07/02/%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8Makefile-01%E5%88%9D%E8%AF%86Makefile/index.html">
+<meta property="og:site_name" content="Pam_ma_ru&#39;s Blog">
+<meta property="og:description" content="前言这篇博客是一篇笔记，可能有许多不严谨的地方 我学习过程中使用的环境是Arch Linux x86_64，使用的编译器为gcc (GCC) 14.1.1，make版本为GNU Make 4.4.1 什么是Make、Makefile先来看看维基百科关于Make的解释：  In software development, Make is a command-line interface (CLI)">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-07-02T07:15:43.000Z">
+<meta property="article:modified_time" content="2024-07-02T11:53:08.951Z">
+<meta property="article:author" content="Pan_ma_ru">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://panmaru.github.io/2024/07/02/%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8Makefile-01%E5%88%9D%E8%AF%86Makefile/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"Zh-CN","comments":true,"permalink":"http://panmaru.github.io/2024/07/02/%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8Makefile-01%E5%88%9D%E8%AF%86Makefile/","path":"2024/07/02/学习使用Makefile-01初识Makefile/","title":"学习使用Makefile-01初识Makefile"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>学习使用Makefile-01初识Makefile | Pam_ma_ru's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Pam_ma_ru's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFMake%E3%80%81Makefile"><span class="nav-number">2.</span> <span class="nav-text">什么是Make、Makefile</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Makefile%E7%9A%84%E8%A7%84%E5%88%99"><span class="nav-number">3.</span> <span class="nav-text">Makefile的规则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A8%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84Makefile%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">动手写一个简单的Makefile文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8F%98%E9%87%8F"><span class="nav-number">5.</span> <span class="nav-text">使用变量</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E6%8E%A8%E5%AF%BC"><span class="nav-number">6.</span> <span class="nav-text">自动推导</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%85%E7%A9%BA%E7%9B%AE%E5%BD%95"><span class="nav-number">7.</span> <span class="nav-text">清空目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Makefile%E7%9A%84%E7%BB%84%E6%88%90"><span class="nav-number">8.</span> <span class="nav-text">Makefile的组成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E4%BA%8EMakefile%E6%96%87%E4%BB%B6%E5%90%8D"><span class="nav-number">9.</span> <span class="nav-text">关于Makefile文件名</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E5%85%B6%E4%BB%96Makefile%E6%96%87%E4%BB%B6"><span class="nav-number">10.</span> <span class="nav-text">包含其他Makefile文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#make%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="nav-number">11.</span> <span class="nav-text">make的工作方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">12.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Pan_ma_ru</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="Zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://panmaru.github.io/2024/07/02/%E5%AD%A6%E4%B9%A0%E4%BD%BF%E7%94%A8Makefile-01%E5%88%9D%E8%AF%86Makefile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Pan_ma_ru">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="学习使用Makefile-01初识Makefile | Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学习使用Makefile-01初识Makefile
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-07-02 15:15:43 / Modified: 19:53:08" itemprop="dateCreated datePublished" datetime="2024-07-02T15:15:43+08:00">2024-07-02</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这篇博客是一篇笔记，可能有许多不严谨的地方</p>
+<p>我学习过程中使用的环境是<code>Arch Linux x86_64</code>，使用的编译器为<code>gcc (GCC) 14.1.1</code>，<code>make</code>版本为<code>GNU Make 4.4.1</code></p>
+<h1 id="什么是Make、Makefile"><a href="#什么是Make、Makefile" class="headerlink" title="什么是Make、Makefile"></a>什么是<strong>Make</strong>、<strong>Makefile</strong></h1><p>先来看看<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Make_(software)">维基百科</a>关于<strong>Make</strong>的解释：</p>
+<blockquote>
+<p>In software development, Make is a command-line interface (CLI) software tool that performs actions ordered by configured dependencies as defined in a configuration file called a makefile. It is commonly used for build automation to build executable code (such as a program or library) from source code. But, not limited to building, Make can perform any operation available via the operating system shell. </p>
+</blockquote>
+<p>概括来说<strong>Make</strong>是一种自动化执行一系列操作（比如构建程序）的命令行工具，而<strong>Makefile</strong>就是配置这些操作的文件。<strong>Make</strong>有许多不同的变种，变种之间在功能上有一些差异，这篇博客使用的是<code>GNU Make</code>。</p>
+<h1 id="Makefile的规则"><a href="#Makefile的规则" class="headerlink" title="Makefile的规则"></a><strong>Makefile</strong>的规则</h1><p><strong>Makefile</strong>由规则组成，一个规则形如：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">target … : prerequisites …</span><br><span class="line">        recipe</span><br><span class="line">        …</span><br><span class="line">        …</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>target</strong>：可以是文件名（目标文件、可执行文件），也可以是一个伪目标（phony target）即一个表示动作的标签（如“clean”）</li>
+<li><strong>prerequisites</strong>：该target所依赖的一系列的文件</li>
+<li><strong>recipe</strong>：该target所需执行的一系列指令</li>
+</ul>
+<p>当执行<code>make</code>后，<code>make</code>会比较<strong>target</strong>和<strong>prerequisites</strong>文件的被修改时间，若<strong>prerequisites</strong>的时间更新，<strong>recipe</strong>所定义的命令就会被执行</p>
+<h1 id="动手写一个简单的Makefile文件"><a href="#动手写一个简单的Makefile文件" class="headerlink" title="动手写一个简单的Makefile文件"></a>动手写一个简单的<strong>Makefile</strong>文件</h1><p>先打开文本编辑器，敲一段简单的C程序，保存为<code>hello.c</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;hello world\n&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新建一个文本文件，命名为<code>Makefile</code>或<code>makefile</code>，写下第一条规则，不要忘记<code>tab</code>键：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hello: hello.c</span><br><span class="line">	gcc hello.c -o hello</span><br></pre></td></tr></table></figure>
+
+<p>在终端中执行<code>make</code>，成功构建<code>hello</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ make</span><br><span class="line">gcc hello.c -o hello</span><br><span class="line">$ ./hello</span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+
+<p>我们继续写一个<code>clean</code>规则，打开之前的Makefile文件，加上：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">clean:</span></span><br><span class="line">	rm hello</span><br></pre></td></tr></table></figure>
+
+<p><code>make</code>默认执行第一条规则，要想指定规则只需要在<code>make</code>后加上规则对应的target：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make clean</span><br><span class="line"><span class="built_in">rm</span> hello</span><br></pre></td></tr></table></figure>
+
+<p>可以发现<code>hello</code>文件成功删除</p>
+<p>默认情况下，即执行<code>make</code>且不给任何参数：</p>
+<ol>
+<li><code>make</code>首先会在当前目录下寻找名为<code>Makefile</code>或<code>makefile</code>的文件</li>
+<li>如果找到，它会找到第一个目标文件（target）</li>
+<li>如果该目标文件不存在，或是该目标文件所依赖的文件修改时间比自己新，会执行后面定义的命令来生成该目标文件</li>
+<li>如果目标文件所依赖的文件也不存在，<code>make</code>又会寻找依赖文件的依赖性并生成该文件</li>
+<li>所有依赖文件都存在，生成目标文件</li>
+</ol>
+<p>可以发现整个过程中，<code>make</code>会一层又一层的寻找依赖关系，在找寻的过程中若发生错误（比如依赖的文件找不到）就会直接退出并报错。需要注意的是，对于定义的命令发生的错误（比如编译不成功）<code>make</code>并不会处理</p>
+<h1 id="使用变量"><a href="#使用变量" class="headerlink" title="使用变量"></a>使用变量</h1><p>以下面这个Makefile文件为例，注意<code>\</code>这里起换行符的作用，用来方便文件的阅读</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">edit : main.o kbd.o command.o display.o \</span><br><span class="line">        insert.o search.o files.o utils.o</span><br><span class="line">    cc -o edit main.o kbd.o command.o display.o \</span><br><span class="line">        insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">main.o : main.c defs.h</span><br><span class="line">    cc -c main.c</span><br><span class="line">kbd.o : kbd.c defs.h command.h</span><br><span class="line">    cc -c kbd.c</span><br><span class="line">command.o : command.c defs.h command.h</span><br><span class="line">    cc -c command.c</span><br><span class="line">display.o : display.c defs.h buffer.h</span><br><span class="line">    cc -c display.c</span><br><span class="line">insert.o : insert.c defs.h buffer.h</span><br><span class="line">    cc -c insert.c</span><br><span class="line">search.o : search.c defs.h buffer.h</span><br><span class="line">    cc -c search.c</span><br><span class="line">files.o : files.c defs.h buffer.h command.h</span><br><span class="line">    cc -c files.c</span><br><span class="line">utils.o : utils.c defs.h</span><br><span class="line">    cc -c utils.c</span><br><span class="line">clean :</span><br><span class="line">    rm edit main.o kbd.o command.o display.o \</span><br><span class="line">        insert.o search.o files.o utils.o</span><br></pre></td></tr></table></figure>
+
+<p>注意到edit规则，可以发现一些<code>.o</code>文件名被重复了两次，当之后再加入一个<code>.o</code>文件时就需要在多处添加这个文件名，很不方便，为了方便维护可以使用变量</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">edit : main.o kbd.o command.o display.o \</span><br><span class="line">        insert.o search.o files.o utils.o</span><br><span class="line">    cc -o edit main.o kbd.o command.o display.o \</span><br><span class="line">        insert.o search.o files.o utils.o</span><br></pre></td></tr></table></figure>
+
+<p>可以声明一个<code>objects</code>变量：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">     insert.o search.o files.o utils.o</span><br></pre></td></tr></table></figure>
+
+<p>之后使用<code>$(objects)</code>来代替原先的<code>.o</code>文件名：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">    insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : <span class="variable">$(objects)</span></span><br><span class="line">    cc -o edit <span class="variable">$(objects)</span></span><br><span class="line">main.o : main.c defs.h</span><br><span class="line">    cc -c main.c</span><br><span class="line">kbd.o : kbd.c defs.h command.h</span><br><span class="line">    cc -c kbd.c</span><br><span class="line">command.o : command.c defs.h command.h</span><br><span class="line">    cc -c command.c</span><br><span class="line">display.o : display.c defs.h buffer.h</span><br><span class="line">    cc -c display.c</span><br><span class="line">insert.o : insert.c defs.h buffer.h</span><br><span class="line">    cc -c insert.c</span><br><span class="line">search.o : search.c defs.h buffer.h</span><br><span class="line">    cc -c search.c</span><br><span class="line">files.o : files.c defs.h buffer.h command.h</span><br><span class="line">    cc -c files.c</span><br><span class="line">utils.o : utils.c defs.h</span><br><span class="line">    cc -c utils.c</span><br><span class="line">clean :</span><br><span class="line">    rm edit <span class="variable">$(objects)</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="自动推导"><a href="#自动推导" class="headerlink" title="自动推导"></a>自动推导</h1><p><code>make</code>支持自动推导文件以及依赖关系之后的指令</p>
+<p>例如对于<code>foobar.o</code>文件，<code>make</code>会自动将<code>foobar.c</code>文件加入到依赖关系中，同时也会推导<code>cc -c foobar.c</code>，由此可以进一步改进上面的文件：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">bjects = main.o kbd.o command.o display.o \</span><br><span class="line">    insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : <span class="variable">$(objects)</span></span><br><span class="line">    cc -o edit <span class="variable">$(objects)</span></span><br><span class="line"></span><br><span class="line">main.o : defs.h</span><br><span class="line">kbd.o : defs.h command.h</span><br><span class="line">command.o : defs.h command.h</span><br><span class="line">display.o : defs.h buffer.h</span><br><span class="line">insert.o : defs.h buffer.h</span><br><span class="line">search.o : defs.h buffer.h</span><br><span class="line">files.o : defs.h buffer.h command.h</span><br><span class="line">utils.o : defs.h</span><br><span class="line"></span><br><span class="line">.PHONY : clean</span><br><span class="line">clean :</span><br><span class="line">    rm edit <span class="variable">$(objects)</span></span><br></pre></td></tr></table></figure>
+
+<p>可以发现<code>defs.h</code>被重复了很多次，由此可以进一步改进：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">objects = main.o kbd.o command.o display.o \</span><br><span class="line">    insert.o search.o files.o utils.o</span><br><span class="line"></span><br><span class="line">edit : <span class="variable">$(objects)</span></span><br><span class="line">    cc -o edit <span class="variable">$(objects)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$(objects)</span> : defs.h</span><br><span class="line">kbd.o command.o files.o : command.h</span><br><span class="line">display.o insert.o search.o files.o : buffer.h</span><br><span class="line"></span><br><span class="line">.PHONY : clean</span><br><span class="line">clean :</span><br><span class="line">    rm edit <span class="variable">$(objects)</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="清空目录"><a href="#清空目录" class="headerlink" title="清空目录"></a>清空目录</h1><p>为了保持目录的干净，常定义一个用于清空目标文件和可执行文件的规则，可以如上面使用：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">clean:</span></span><br><span class="line">    rm edit <span class="variable">$(objects)</span></span><br></pre></td></tr></table></figure>
+
+<p>但更好的做法是：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.PHONY : clean</span><br><span class="line">clean :</span><br><span class="line">    -rm edit <span class="variable">$(objects)</span></span><br></pre></td></tr></table></figure>
+
+<p>此处的<code>.PHONY</code>表示<code>clean</code>是一个伪目标，可以避免与同名的<code>clean</code>文件冲突</p>
+<p><code>rm</code>前的<code>-</code>表示<code>make</code>会忽略这条命令发生的错误</p>
+<h1 id="Makefile的组成"><a href="#Makefile的组成" class="headerlink" title="Makefile的组成"></a>Makefile的组成</h1><p><code>Makefile</code>主要包括五个东西：显式规则、隐式规则、变量定义、指令和注释</p>
+<ul>
+<li>显式规则：显式的说明如何生成目标文件</li>
+<li>隐式规则：<code>make</code>自动推导</li>
+<li>变量定义：定义的一系列变量</li>
+<li>指令：引用另一个Makefile文件；依据情况指定Makefile的有效部分（类似C语言的<code>#if</code>）；定义一个多行的命令</li>
+<li>注释：Makefile使用’#’表示单行注释，要想使用字符<code>#</code>需要使用<code>\#</code></li>
+</ul>
+<h1 id="关于Makefile文件名"><a href="#关于Makefile文件名" class="headerlink" title="关于Makefile文件名"></a>关于Makefile文件名</h1><p>默认下<code>make</code>会在当前目录下顺序寻找名为<code>GNUmakefile</code>、<code>makefile</code>和<code>Makefile</code>的文件<br>推荐使用<code>Makefile</code>，因为这个文件名按按文件名顺序排序后更靠近其他重要的文件（如<code>README</code>）；不推荐使用<code>GNUmakefile</code>因为通常只有<code>make</code>会识别到这个文件</p>
+<p>也可以指定Makefile的文件名，即使用<code>-f</code>或<code>--file</code>参数，如<code>make -f Make.solaris</code></p>
+<h1 id="包含其他Makefile文件"><a href="#包含其他Makefile文件" class="headerlink" title="包含其他Makefile文件"></a>包含其他Makefile文件</h1><p>Makefile可以使用<code>include</code>将其他Makefile文件包含进来，其语法是：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> &lt;filenames&gt;...</span><br></pre></td></tr></table></figure>
+
+<p><code>&lt;filenames&gt;</code>可以包含路径和通配符，因此可以这样：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> foo.make *.mk <span class="variable">$(bar)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>make</code>在开始时会寻找<code>include</code>指定的其他Makefile并将他们放在对应的位置，如果在当前目录下没有找到文件，会按以下顺序继续查找：</p>
+<ol>
+<li>若<code>make</code>使用了<code>-I</code>或<code>--include-dir</code>参数，会在给定目录继续寻找</li>
+<li>接下来按<code>&lt;prefix&gt;/include</code>（一般是 <code>/usr/local/bin</code> ）、<code>/usr/gnu/include</code>、<code>/usr/local/include</code>、<code>/usr/include</code>的顺序寻找</li>
+</ol>
+<p>若文件没有找到，<code>make</code>会生成一条警告信息，并继续载入其他文件，一旦完成Makefile文件的读取，<code>make</code>会重试之前没有找到的文件或无法读取的文件，若仍是不行则会出现一条致命警告，若想要<code>make</code>不管这些无法读取的文件继续执行可以使用<code>-include</code>或<code>sinclude</code></p>
+<h1 id="make的工作方式"><a href="#make的工作方式" class="headerlink" title="make的工作方式"></a><code>make</code>的工作方式</h1><ol>
+<li>读入所有的Makefile文件</li>
+<li>读入被<code>include</code>的Makefile文件</li>
+<li>初始化文件中的变量</li>
+<li>推导隐式规则，分析所有的规则</li>
+<li>为所有目标文件创建依赖关系链</li>
+<li>根据依赖关系决定那些目标需要重新生成</li>
+<li>执行生成命令</li>
+</ol>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://seisman.github.io/how-to-write-makefile/">跟我一起写Makefile</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Make_(software)">Make (software) - Wikipedia</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.gnu.org/software/make/manual/make.html">GNU make</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/06/29/%E4%BD%BF%E7%94%A8VSCode%E5%86%99Markdown/" rel="prev" title="使用VSCode写Markdown">
+                  <i class="fa fa-angle-left"></i> 使用VSCode写Markdown
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Pan_ma_ru</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
