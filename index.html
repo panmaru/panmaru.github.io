@@ -170,7 +170,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-07-03 17:05:45 / Modified: 20:25:55" itemprop="dateCreated datePublished" datetime="2024-07-03T17:05:45+08:00">2024-07-03</time>
+      <time title="Created: 2024-07-03 17:05:45 / Modified: 20:32:10" itemprop="dateCreated datePublished" datetime="2024-07-03T17:05:45+08:00">2024-07-03</time>
     </span>
 
   
@@ -191,7 +191,7 @@
 <h1 id="编译运行程序并得到core文件"><a href="#编译运行程序并得到core文件" class="headerlink" title="编译运行程序并得到core文件"></a>编译运行程序并得到core文件</h1><p>使用<code>gcc</code>编译<code>test.c</code>：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gcc -ggdb test.c -o test.out</span><br></pre></td></tr></table></figure>
 
-<p><code>-ggdb</code>选项用来生成调试信息，需要注意的是<code>-g</code>同样也会生成调试信息，但<code>-g</code>利用操作系统的<strong>原生格式</strong>（native format）生成调试信息，可以被GDB以及其他调试器利用；而<code>-ggdb</code>为GDB专门生成了更丰富的调试信息，只能使用DDB调试<br><img src="/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/gcc%E7%9A%84-ggdb%E9%80%89%E9%A1%B9.png" alt="gcc的-ggdb选项"></p>
+<p><code>-ggdb</code>选项用来生成调试信息，需要注意的是<code>-g</code>同样也会生成调试信息，但<code>-g</code>利用操作系统的<strong>原生格式</strong>（native format）生成调试信息，可以被GDB以及其他调试器利用；而<code>-ggdb</code>为GDB专门生成了更丰富的调试信息，只能使用GDB调试<br><img src="/2024/07/03/GDB%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/gcc%E7%9A%84-ggdb%E9%80%89%E9%A1%B9.png" alt="gcc的-ggdb选项"></p>
 <p>成功编译，尝试运行：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">ls</span></span><br><span class="line">test.c  test.out</span><br><span class="line">$ ./test.out </span><br><span class="line">[1]    6209 floating point exception (core dumped)  ./test.out</span><br></pre></td></tr></table></figure>
 
