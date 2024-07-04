@@ -113,7 +113,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -131,6 +131,155 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://panmaru.github.io/2024/07/03/Tmux%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Pan_ma_ru">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/07/03/Tmux%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/" class="post-title-link" itemprop="url">Tmux基础用法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-07-03 22:37:11" itemprop="dateCreated datePublished" datetime="2024-07-03T22:37:11+08:00">2024-07-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-07-04 10:26:55" itemprop="dateModified" datetime="2024-07-04T10:26:55+08:00">2024-07-04</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这篇博客是一篇笔记，可能有许多不严谨的地方</p>
+<h1 id="什么是Tmux"><a href="#什么是Tmux" class="headerlink" title="什么是Tmux"></a>什么是Tmux</h1><p>Tmux是一个<strong>终端复用器</strong>（terminal multiplexer）,可以实现在同一个窗口访问多个会话等功能</p>
+<h1 id="关于会话与进程"><a href="#关于会话与进程" class="headerlink" title="关于会话与进程"></a>关于会话与进程</h1><p>一般来讲，通过命令行启动的进程都与会话绑定在一起，当会话终止的时候相应的进程也会随之强行终止（比如SSH连接断开）</p>
+<p>Tmux就是一种可以将会话与进程“解绑”的工具，直接用别人的说法：</p>
+<blockquote>
+</blockquote>
+<pre><code>（1）它允许在单个窗口中，同时访问多个会话。这对于同时运行多个命令行程序很有用。
+（2） 它可以让新窗口&quot;接入&quot;已经存在的会话。
+（3）它允许每个会话有多个连接窗口，因此可以多人实时共享会话。
+（4）它还支持窗口任意的垂直和水平拆分。
+</code></pre>
+<h1 id="启动Tmux"><a href="#启动Tmux" class="headerlink" title="启动Tmux"></a>启动Tmux</h1><p>在使用Tmux前请通过包管理器安装Tmux</p>
+<p>在终端中输入<code>tmux</code>进入Tmux的界面：<br><img src="/2024/07/03/Tmux%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95/tmux%E7%95%8C%E9%9D%A2.png" alt="Tmux界面"></p>
+<p>可以发现打开了一个终端界面，下面多了一行绿色的状态栏</p>
+<p>当Tmux启动的时候，它创建了一个新的会话并连带一个窗口</p>
+<p>一个<strong>会话</strong>(session)可以认为是一些由Tmux管理的“伪终端”组成的集合（a single collection of pseudo terminals under the management of tmux）：每个会话可以有多个<strong>窗口</strong>（window），一个窗口占据一整个屏幕且能被分成多个<strong>矩形窗格</strong>（rectangular pane），每个矩形窗格是一个独立的伪终端</p>
+<p>想要结束会话只需要输入<code>exit</code>或按下<code>Ctrl+d</code>即可</p>
+<h1 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h1><p>Tmux的基础用法形如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux [<span class="built_in">command</span> [flags]]</span><br></pre></td></tr></table></figure>
+
+<p><code>command [flags]</code>用来控制Tmux的行为，若不给出则默认是<code>new-session</code>（新建会话）</p>
+<h2 id="会话管理"><a href="#会话管理" class="headerlink" title="会话管理"></a>会话管理</h2><h3 id="新建会话"><a href="#新建会话" class="headerlink" title="新建会话"></a>新建会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux new [-s session-name]</span><br></pre></td></tr></table></figure>
+
+<p>也可以在Tmux中按下<code>Ctrl+b :</code>然后输入<code>new</code></p>
+<h3 id="分离会话"><a href="#分离会话" class="headerlink" title="分离会话"></a>分离会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux detach</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用快捷键<code>Ctrl+b d</code></p>
+<h3 id="查看会话"><a href="#查看会话" class="headerlink" title="查看会话"></a>查看会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="接入会话"><a href="#接入会话" class="headerlink" title="接入会话"></a>接入会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux attach [-t target-session]</span><br></pre></td></tr></table></figure>
+
+<h3 id="切换会话"><a href="#切换会话" class="headerlink" title="切换会话"></a>切换会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux switch [-t target-session]</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用快捷键<code>Ctrl+b s</code>切换<br><code>Ctrl+b (</code>切换到上一个会话<br><code>Ctrl+b )</code>切换到下一个会话</p>
+<h3 id="重命名会话"><a href="#重命名会话" class="headerlink" title="重命名会话"></a>重命名会话</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux rename-session [-t target-session] new-name</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用快捷键<code>Ctrl+b $</code>重命名</p>
+<h3 id="杀死会话"><a href="#杀死会话" class="headerlink" title="杀死会话"></a>杀死会话</h3><p>如果加上选项<code>-a</code>表示杀死除了指定会话以外的所有会话</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux kill-session [-a] [-t target-session]</span><br></pre></td></tr></table></figure>
+
+<h2 id="窗口与窗格"><a href="#窗口与窗格" class="headerlink" title="窗口与窗格"></a>窗口与窗格</h2><h3 id="划分窗口"><a href="#划分窗口" class="headerlink" title="划分窗口"></a>划分窗口</h3><p>默认上下划分窗口，加上选项<code>-h</code>左右划分</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux split-window [-h]</span><br></pre></td></tr></table></figure>
+
+<p>可以使用快捷键<code>Ctrl+b &quot;</code>和<code>Ctrl+b %</code></p>
+<h3 id="切换窗格"><a href="#切换窗格" class="headerlink" title="切换窗格"></a>切换窗格</h3><p><code>-U</code>、<code>-D</code>、<code>-L</code>和<code>-R</code>分别表示切换到上、下、左、右的窗格</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux select-pane [-DLRU]</span><br></pre></td></tr></table></figure>
+
+<p>可以使用快捷键<code>Ctrl+b &lt;arrow key&gt;</code></p>
+<p>快捷键<code>Ctrl+b q</code>查看窗格编号<br><code>Ctrl+b q &lt;number&gt;</code>切换窗格</p>
+<h3 id="删除窗格"><a href="#删除窗格" class="headerlink" title="删除窗格"></a>删除窗格</h3><p>如果加上选项<code>-a</code>表示杀死除了指定窗格以外的所有窗格</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux kill-pane [-t target-pane]</span><br></pre></td></tr></table></figure>
+
+<p>可以使用快捷键<code>Ctrl+b x</code></p>
+<h3 id="窗格全屏"><a href="#窗格全屏" class="headerlink" title="窗格全屏"></a>窗格全屏</h3><p>快捷键<code>Ctrl+b z</code>，再按一次恢复</p>
+<h3 id="调整窗格大小"><a href="#调整窗格大小" class="headerlink" title="调整窗格大小"></a>调整窗格大小</h3><p>快捷键<code>Ctrl+b Ctrl+&lt;arrow key&gt;</code></p>
+<h3 id="新建窗口"><a href="#新建窗口" class="headerlink" title="新建窗口"></a>新建窗口</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux new-window [-n window-name]</span><br></pre></td></tr></table></figure>
+
+<p>快捷键<code>Ctrl+b c</code></p>
+<h3 id="切换窗口"><a href="#切换窗口" class="headerlink" title="切换窗口"></a>切换窗口</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tmux select-window [-t target-window]</span><br></pre></td></tr></table></figure>
+
+<p><code>Ctrl+b p</code>切换到上一个窗口<br><code>Ctrl+b n</code>切换到下一个窗口<br><code>Ctrl+b &lt;number&gt;</code>切换到指定窗口<br><code>Ctrl+b w</code>选择窗口</p>
+<h3 id="窗口重命名"><a href="#窗口重命名" class="headerlink" title="窗口重命名"></a>窗口重命名</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rename-window [-t target-window] new-name</span><br></pre></td></tr></table></figure>
+
+<p>快捷键<code>Ctrl+b ,</code></p>
+<h3 id="杀死窗口"><a href="#杀死窗口" class="headerlink" title="杀死窗口"></a>杀死窗口</h3><p>如果加上选项<code>-a</code>表示杀死除了指定窗口以外的所有窗口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kill-window [-a] [-t target-window]</span><br></pre></td></tr></table></figure>
+
+<p>快捷键<code>Ctrl+b &amp;</code></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2019/10/tmux.html">Tmux 使用教程 - 阮一峰的网络日志</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.hpc.sjtu.edu.cn/login/tmux.html">Tmux使用介绍 - 上海交大超算平台用户手册 Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.wylu.me/posts/996c49c/#tmux-%E7%AE%80%E4%BB%8B%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97">tmux 简介与使用指南 | wylu</a></li>
+<li><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man1/tmux.1.html">tmux(1) - Linux manual page</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
