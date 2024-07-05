@@ -170,7 +170,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2024-07-05 10:59:04 / Modified: 11:18:03" itemprop="dateCreated datePublished" datetime="2024-07-05T10:59:04+08:00">2024-07-05</time>
+      <time title="Created: 2024-07-05 10:59:04 / Modified: 13:14:39" itemprop="dateCreated datePublished" datetime="2024-07-05T10:59:04+08:00">2024-07-05</time>
     </span>
 
   
@@ -183,13 +183,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="make编译加速"><a href="#make编译加速" class="headerlink" title="make编译加速"></a><code>make</code>编译加速</h1><p><code>make</code>默认单线程编译所有文件，可以使用<code>-j</code>选项多线程编译</p>
+          <h1 id="make编译加速"><a href="#make编译加速" class="headerlink" title="make编译加速"></a><code>make</code>编译加速</h1><p><code>make</code>默认单线程编译所有文件，可以使用<code>-j</code>选项多任务并行编译</p>
 <ol>
 <li>首先使用<code>lscpu -e</code>显示CPU核心数</li>
-<li>之后使用<code>make</code>时加上一个<code>-j?</code>参数，<code>?</code>为线程数量</li>
+<li>之后使用<code>make</code>时加上一个<code>-j?</code>参数，<code>?</code>为并行数量</li>
 </ol>
 <p>想要比对使用前后的编译速度可以使用<code>time</code>（只用看total那一栏），但记得要先清楚先前的编译结果</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make clean &amp;&amp; time make [OPTION]... [TARGET]... -j?</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make clean &amp;&amp; time make -j?</span><br></pre></td></tr></table></figure>
 
 <h1 id="使用ccache"><a href="#使用ccache" class="headerlink" title="使用ccache"></a>使用<code>ccache</code></h1><p><code>ccache</code>是一个C&#x2F;C++的<code>compiler cache</code>，可以将编译结果缓存以便之后快速获取结果</p>
 <p>先通过包管理器安装<code>ccache</code></p>
