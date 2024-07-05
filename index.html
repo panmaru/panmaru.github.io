@@ -113,7 +113,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -131,6 +131,99 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://panmaru.github.io/2024/07/05/C-C-%E5%8A%A0%E5%BF%AB%E7%BC%96%E8%AF%91%E9%80%9F%E5%BA%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Pan_ma_ru">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Pam_ma_ru's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/07/05/C-C-%E5%8A%A0%E5%BF%AB%E7%BC%96%E8%AF%91%E9%80%9F%E5%BA%A6/" class="post-title-link" itemprop="url">C/C++加快编译速度</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-07-05 10:59:04 / Modified: 11:18:03" itemprop="dateCreated datePublished" datetime="2024-07-05T10:59:04+08:00">2024-07-05</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="make编译加速"><a href="#make编译加速" class="headerlink" title="make编译加速"></a><code>make</code>编译加速</h1><p><code>make</code>默认单线程编译所有文件，可以使用<code>-j</code>选项多线程编译</p>
+<ol>
+<li>首先使用<code>lscpu -e</code>显示CPU核心数</li>
+<li>之后使用<code>make</code>时加上一个<code>-j?</code>参数，<code>?</code>为线程数量</li>
+</ol>
+<p>想要比对使用前后的编译速度可以使用<code>time</code>（只用看total那一栏），但记得要先清楚先前的编译结果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make clean &amp;&amp; time make [OPTION]... [TARGET]... -j?</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用ccache"><a href="#使用ccache" class="headerlink" title="使用ccache"></a>使用<code>ccache</code></h1><p><code>ccache</code>是一个C&#x2F;C++的<code>compiler cache</code>，可以将编译结果缓存以便之后快速获取结果</p>
+<p>先通过包管理器安装<code>ccache</code></p>
+<p>打开<code>~/.zshrc</code>（如果你使用<code>bash</code>的话打开<code>~/.bashrc</code>，下文同理），将下一行添加到文件中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;/usr/lib/ccache/bin:<span class="variable">$PATH</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>之后立即应用刚才的更改：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<p>可以使用<code>which</code>来查看是否已经生效：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> gcc</span><br><span class="line">/usr/lib/ccache/bin/gcc</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>time</code>测试编译的速度，可以发现第一次编译速度甚至慢于使用<code>ccache</code>之前，但第一次之后的编译速度有明显的提升</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://nju-projectn.github.io/ics-pa-gitbook/ics2023/1.1.html">在开始愉快的PA之旅之前 · GitBook</a></li>
+<li><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/title/Ccache">ccache - ArchWiki</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
