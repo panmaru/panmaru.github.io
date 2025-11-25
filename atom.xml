@@ -18,8 +18,8 @@
   
   <entry>
     <title>Linux下静态库、动态库</title>
-    <link href="https://panmaru.github.io/2025/11/25/static-and-dynamic-libraries-under-linux/"/>
-    <id>https://panmaru.github.io/2025/11/25/static-and-dynamic-libraries-under-linux/</id>
+    <link href="https://panmaru.github.io/2025/11/25/static-and-shared-libraries-under-linux/"/>
+    <id>https://panmaru.github.io/2025/11/25/static-and-shared-libraries-under-linux/</id>
     <published>2025-11-25T13:50:18.000Z</published>
     <updated>2025-11-25T14:55:40.222Z</updated>
     
