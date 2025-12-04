@@ -1,0 +1,1115 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Panmaru">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="概述Linux系统提供了一套完整的系统编程API，涵盖了文件操作、进程管理、设备控制、内存管理和进程间通信等核心功能。这些系统调用提供了对操作系统底层资源的直接访问，是所有高级应用和库函数的基础。 文件描述符 (File Descriptor)文件描述符是一个非负整数，用于标识打开的文件、管道、套接字等I&#x2F;O资源。每个进程默认有三个标准文件描述符：  0 - 标准输入 (STDIN_FI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统编程">
+<meta property="og:url" content="https://panmaru.github.io/2025/12/04/linux-programming/index.html">
+<meta property="og:site_name" content="Panmaru&#39;s Blog">
+<meta property="og:description" content="概述Linux系统提供了一套完整的系统编程API，涵盖了文件操作、进程管理、设备控制、内存管理和进程间通信等核心功能。这些系统调用提供了对操作系统底层资源的直接访问，是所有高级应用和库函数的基础。 文件描述符 (File Descriptor)文件描述符是一个非负整数，用于标识打开的文件、管道、套接字等I&#x2F;O资源。每个进程默认有三个标准文件描述符：  0 - 标准输入 (STDIN_FI">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-04T15:38:52.000Z">
+<meta property="article:modified_time" content="2025-12-04T15:39:25.031Z">
+<meta property="article:author" content="Panmaru">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Linux系统编程 - Panmaru&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"panmaru.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"><link rel="alternate" href="/atom.xml" title="Panmaru's Blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Panmaru&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/resources" target="_self">
+                <i class="iconfont icon-books"></i>
+                <span>资源</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml" target="_self">
+                <i class="iconfont icon-rss"></i>
+                <span>RSS</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Linux系统编程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-04 23:38" pubdate>
+          2025年12月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Linux系统编程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Linux系统提供了一套完整的系统编程API，涵盖了文件操作、进程管理、设备控制、内存管理和进程间通信等核心功能。这些系统调用提供了对操作系统底层资源的直接访问，是所有高级应用和库函数的基础。</p>
+<h2 id="文件描述符-File-Descriptor"><a href="#文件描述符-File-Descriptor" class="headerlink" title="文件描述符 (File Descriptor)"></a>文件描述符 (File Descriptor)</h2><p>文件描述符是一个非负整数，用于标识打开的文件、管道、套接字等I&#x2F;O资源。每个进程默认有三个标准文件描述符：</p>
+<ul>
+<li><code>0</code> - 标准输入 (<code>STDIN_FILENO</code>)</li>
+<li><code>1</code> - 标准输出 (<code>STDOUT_FILENO</code>)</li>
+<li><code>2</code> - 标准错误 (<code>STDERR_FILENO</code>)</li>
+</ul>
+<h2 id="open-打开文件"><a href="#open-打开文件" class="headerlink" title="open - 打开文件"></a><code>open</code> - 打开文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/stat.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">open</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">int</span> flags)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">open</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">int</span> flags, <span class="hljs-type">mode_t</span> mode)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 要打开的文件路径</li>
+<li><code>flags</code>: 打开标志，可以使用多个标志的按位或</li>
+<li><code>mode</code>: 文件权限（仅在创建新文件时使用）</li>
+</ul>
+<h3 id="常用标志"><a href="#常用标志" class="headerlink" title="常用标志"></a>常用标志</h3><p><strong>访问模式（必须包含其一，且互斥）：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">O_RDONLY     <span class="hljs-comment">// 只读打开</span><br>O_WRONLY     <span class="hljs-comment">// 只写打开</span><br>O_RDWR       <span class="hljs-comment">// 读写打开</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>其他标志：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c">O_CREAT      <span class="hljs-comment">// 文件不存在时创建</span><br>O_EXCL       <span class="hljs-comment">// 与O_CREAT一起使用，文件存在则失败</span><br>O_TRUNC      <span class="hljs-comment">// 如果文件存在且可写，清空文件内容</span><br>O_APPEND     <span class="hljs-comment">// 追加模式</span><br>O_NONBLOCK   <span class="hljs-comment">// 非阻塞模式</span><br>O_SYNC       <span class="hljs-comment">// 同步写入</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="重要说明"><a href="#重要说明" class="headerlink" title="重要说明"></a>重要说明</h3><ol>
+<li><p><strong>访问模式必须指定</strong>：<code>O_RDONLY</code>、<code>O_WRONLY</code>、<code>O_RDWR</code>这三个访问模式标志必须包含其一，且它们之间互斥，不能同时使用。</p>
+</li>
+<li><p><strong>O_CREAT需要mode参数</strong>：如果在flags中包含<code>O_CREAT</code>标志，则必须提供第三个参数<code>mode</code>来指定新创建文件的访问权限，否则mode参数将为随机垃圾值。</p>
+</li>
+<li><p><strong>文件权限计算</strong>：使用<code>O_CREAT</code>创建新文件时，实际的文件访问权限为 <code>(mode &amp; ~umask)</code>。umask是进程的文件创建掩码，用于限制新创建文件的默认权限。</p>
+</li>
+</ol>
+<h3 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回新的文件描述符</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;example.txt&quot;</span>, O_RDWR | O_CREAT | O_TRUNC, <span class="hljs-number">0644</span>);<br><span class="hljs-keyword">if</span> (fd == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;open&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="close-关闭文件"><a href="#close-关闭文件" class="headerlink" title="close - 关闭文件"></a><code>close</code> - 关闭文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">close</span><span class="hljs-params">(<span class="hljs-type">int</span> fd)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-1"><a href="#参数说明-1" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>fd</code>: 要关闭的文件描述符</li>
+</ul>
+<h3 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (close(fd) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;close&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="read-读取数据"><a href="#read-读取数据" class="headerlink" title="read - 读取数据"></a><code>read</code> - 读取数据</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">ssize_t</span> <span class="hljs-title function_">read</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">void</span> *buf, <span class="hljs-type">size_t</span> count)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-2"><a href="#参数说明-2" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>fd</code>: 文件描述符</li>
+<li><code>buf</code>: 读取数据的缓冲区</li>
+<li><code>count</code>: 要读取的字节数</li>
+</ul>
+<h3 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回实际读取的字节数（可能小于count）</li>
+<li>0：到达文件末尾</li>
+<li>-1：出错，设置errno</li>
+</ul>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">char</span> buffer[<span class="hljs-number">1024</span>];<br><span class="hljs-type">ssize_t</span> bytes_read = read(fd, buffer, <span class="hljs-keyword">sizeof</span>(buffer) - <span class="hljs-number">1</span>);<br><span class="hljs-keyword">if</span> (bytes_read == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;read&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br>buffer[bytes_read] = <span class="hljs-string">&#x27;\0&#x27;</span>;  <span class="hljs-comment">// 确保字符串终止</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="write-写入数据"><a href="#write-写入数据" class="headerlink" title="write - 写入数据"></a><code>write</code> - 写入数据</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">ssize_t</span> <span class="hljs-title function_">write</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *buf, <span class="hljs-type">size_t</span> count)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-3"><a href="#参数说明-3" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>fd</code>: 文件描述符</li>
+<li><code>buf</code>: 要写入的数据缓冲区</li>
+<li><code>count</code>: 要写入的字节数</li>
+</ul>
+<h3 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回实际写入的字节数（可能小于count）</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">const</span> <span class="hljs-type">char</span> *message = <span class="hljs-string">&quot;Hello, Linux I/O!\n&quot;</span>;<br><span class="hljs-type">ssize_t</span> bytes_written = write(fd, message, <span class="hljs-built_in">strlen</span>(message));<br><span class="hljs-keyword">if</span> (bytes_written == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;write&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="lseek-设置文件偏移量"><a href="#lseek-设置文件偏移量" class="headerlink" title="lseek - 设置文件偏移量"></a><code>lseek</code> - 设置文件偏移量</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><br><span class="hljs-type">off_t</span> <span class="hljs-title function_">lseek</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">off_t</span> offset, <span class="hljs-type">int</span> whence)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-4"><a href="#参数说明-4" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>fd</code>: 文件描述符</li>
+<li><code>offset</code>: 偏移量</li>
+<li><code>whence</code>: 起始位置</li>
+</ul>
+<h3 id="whence值"><a href="#whence值" class="headerlink" title="whence值"></a>whence值</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">SEEK_SET    <span class="hljs-comment">// 文件开始处</span><br>SEEK_CUR    <span class="hljs-comment">// 当前位置</span><br>SEEK_END    <span class="hljs-comment">// 文件末尾</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="返回值-4"><a href="#返回值-4" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回新的文件偏移量</li>
+<li>失败：返回(off_t)-1，设置errno</li>
+</ul>
+<h3 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 移动到文件开始处</span><br><span class="hljs-type">off_t</span> pos = lseek(fd, <span class="hljs-number">0</span>, SEEK_SET);<br><br><span class="hljs-comment">// 获取当前文件位置</span><br><span class="hljs-type">off_t</span> current_pos = lseek(fd, <span class="hljs-number">0</span>, SEEK_CUR);<br><br><span class="hljs-comment">// 移动到文件末尾</span><br><span class="hljs-type">off_t</span> file_size = lseek(fd, <span class="hljs-number">0</span>, SEEK_END);<br></code></pre></td></tr></table></figure>
+
+<h3 id="重要说明：文件空洞-File-Hole"><a href="#重要说明：文件空洞-File-Hole" class="headerlink" title="重要说明：文件空洞 (File Hole)"></a>重要说明：文件空洞 (File Hole)</h3><p><code>lseek()</code> 允许将文件偏移量设置到文件末尾之外（但这不会改变文件的实际大小）。如果之后在这个位置写入数据，那么在间隙（称为”文件空洞”）中读取数据时会返回空字节（<code>\0</code>），直到实际数据被写入到这个间隙中。</p>
+<p><strong>文件空洞的特点：</strong></p>
+<ol>
+<li><strong>不占用存储空间</strong>：文件空洞不占用实际的磁盘存储空间</li>
+<li><strong>读取时返回零字节</strong>：读取空洞区域会返回 <code>\0</code> 字节</li>
+<li><strong>文件大小可能大于实际存储</strong>：stat显示的文件大小可能包含空洞部分</li>
+<li><strong>稀疏文件</strong>：这种含有空洞的文件称为稀疏文件（sparse file）</li>
+</ol>
+<p><strong>示例 - 创建文件空洞：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 创建一个文件，并在1000字节后写入数据</span><br><span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;sparse_file.txt&quot;</span>, O_CREAT | O_WRONLY, <span class="hljs-number">0644</span>);<br><span class="hljs-keyword">if</span> (fd == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;open&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 写入一些数据</span><br>write(fd, <span class="hljs-string">&quot;Start&quot;</span>, <span class="hljs-number">5</span>);<br><br><span class="hljs-comment">// 移动到1000字节后（创建空洞）</span><br>lseek(fd, <span class="hljs-number">1000</span>, SEEK_SET);<br><br><span class="hljs-comment">// 在空洞后写入数据</span><br>write(fd, <span class="hljs-string">&quot;End&quot;</span>, <span class="hljs-number">3</span>);<br><br>close(fd);<br></code></pre></td></tr></table></figure>
+
+<h2 id="access-检查文件访问权限"><a href="#access-检查文件访问权限" class="headerlink" title="access - 检查文件访问权限"></a><code>access</code> - 检查文件访问权限</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">access</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">int</span> mode)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-5"><a href="#参数说明-5" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 要检查的文件路径</li>
+<li><code>mode</code>: 检查的访问模式</li>
+</ul>
+<h3 id="访问模式"><a href="#访问模式" class="headerlink" title="访问模式"></a>访问模式</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">F_OK       <span class="hljs-comment">// 文件是否存在</span><br>R_OK       <span class="hljs-comment">// 读权限</span><br>W_OK       <span class="hljs-comment">// 写权限</span><br>X_OK       <span class="hljs-comment">// 执行权限</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="重要说明-1"><a href="#重要说明-1" class="headerlink" title="重要说明"></a>重要说明</h3><p><strong>权限检查的特殊性</strong>：<code>access()</code>函数的权限检查机制与其他系统调用不同：<code>access()</code>使用调用进程的<strong>真实</strong>UID和GID进行检查，而不是像<code>open()</code>等函数那样使用有效ID。</p>
+<h4 id="权限检查的实际含义"><a href="#权限检查的实际含义" class="headerlink" title="权限检查的实际含义"></a>权限检查的实际含义</h4><p><code>access()</code>并不回答”我能否读&#x2F;写&#x2F;执行这个文件？”的问题，而是回答一个稍微不同的问题：</p>
+<blockquote>
+<p>“调用我的用户能否读&#x2F;写&#x2F;执行这个文件？”</p>
+</blockquote>
+<h4 id="与open-的权限检查区别"><a href="#与open-的权限检查区别" class="headerlink" title="与open()的权限检查区别"></a>与open()的权限检查区别</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 假设这是一个setuid root程序</span><br><span class="hljs-comment">// 如果以普通用户身份运行：</span><br><br><span class="hljs-comment">// access()检查：使用普通用户的真实权限</span><br><span class="hljs-keyword">if</span> (access(<span class="hljs-string">&quot;/etc/shadow&quot;</span>, R_OK) == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;access: 用户可以读取/etc/shadow\n&quot;</span>);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;access: 用户不能读取/etc/shadow\n&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">// open()检查：使用程序的有效权限（root权限）</span><br><span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;/etc/shadow&quot;</span>, O_RDONLY);<br><span class="hljs-keyword">if</span> (fd != <span class="hljs-number">-1</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;open: 程序可以读取/etc/shadow\n&quot;</span>);<br>    close(fd);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="返回值-5"><a href="#返回值-5" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0（有相应权限）</li>
+<li>失败：返回-1，设置errno（无权限或文件不存在）</li>
+</ul>
+<h3 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 检查文件是否存在且可读</span><br><span class="hljs-keyword">if</span> (access(<span class="hljs-string">&quot;example.txt&quot;</span>, F_OK | R_OK) == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;文件存在且可读\n&quot;</span>);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    perror(<span class="hljs-string">&quot;access&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">// 在setuid程序中检查用户权限</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">check_user_permission</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *file)</span> &#123;<br>    <span class="hljs-keyword">if</span> (access(file, R_OK) == <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;用户有权限读取 %s\n&quot;</span>, file);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;用户无权限读取 %s\n&quot;</span>, file);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 只有用户有权限时才进行操作</span><br>    <span class="hljs-type">int</span> fd = open(file, O_RDONLY);<br>    <span class="hljs-keyword">if</span> (fd != <span class="hljs-number">-1</span>) &#123;<br>        <span class="hljs-comment">// 处理文件...</span><br>        close(fd);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="chmod-fchmod-修改文件权限"><a href="#chmod-fchmod-修改文件权限" class="headerlink" title="chmod &#x2F; fchmod - 修改文件权限"></a><code>chmod</code> &#x2F; <code>fchmod</code> - 修改文件权限</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/stat.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">chmod</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">mode_t</span> mode)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">fchmod</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">mode_t</span> mode)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-6"><a href="#参数说明-6" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 文件路径（chmod）</li>
+<li><code>fd</code>: 文件描述符（fchmod）</li>
+<li><code>mode</code>: 新的文件权限</li>
+</ul>
+<h3 id="权限设置示例"><a href="#权限设置示例" class="headerlink" title="权限设置示例"></a>权限设置示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 设置为所有者可读写，组和其他用户只读</span><br>chmod(<span class="hljs-string">&quot;file.txt&quot;</span>, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);<br><br><span class="hljs-comment">// 设置为可执行文件（755）</span><br>chmod(<span class="hljs-string">&quot;script.sh&quot;</span>, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);<br><br><span class="hljs-comment">// 使用八进制数设置权限</span><br>chmod(<span class="hljs-string">&quot;data.txt&quot;</span>, <span class="hljs-number">0644</span>);  <span class="hljs-comment">// rw-r--r--</span><br>chmod(<span class="hljs-string">&quot;program&quot;</span>, <span class="hljs-number">0755</span>);   <span class="hljs-comment">// rwxr-xr-x</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="返回值-6"><a href="#返回值-6" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h2 id="chown-fchown-lchown-修改文件所有者"><a href="#chown-fchown-lchown-修改文件所有者" class="headerlink" title="chown &#x2F; fchown &#x2F; lchown - 修改文件所有者"></a><code>chown</code> &#x2F; <code>fchown</code> &#x2F; <code>lchown</code> - 修改文件所有者</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">chown</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">uid_t</span> owner, <span class="hljs-type">gid_t</span> group)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">fchown</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">uid_t</span> owner, <span class="hljs-type">gid_t</span> group)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">lchown</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">uid_t</span> owner, <span class="hljs-type">gid_t</span> group)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-7"><a href="#参数说明-7" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 文件路径（chown, lchown）</li>
+<li><code>fd</code>: 文件描述符（fchown）</li>
+<li><code>owner</code>: 新的用户ID（使用-1保持不变）</li>
+<li><code>group</code>: 新的组ID（使用-1保持不变）</li>
+</ul>
+<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
+<li><code>chown</code>: 跟随符号链接</li>
+<li><code>lchown</code>: 不跟随符号链接</li>
+<li><code>fchown</code>: 操作文件描述符</li>
+</ul>
+<h3 id="返回值-7"><a href="#返回值-7" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-6"><a href="#示例-6" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 只改变组，保持用户不变</span><br>chown(<span class="hljs-string">&quot;file.txt&quot;</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">1000</span>);<br><br><span class="hljs-comment">// 改变用户和组</span><br>chown(<span class="hljs-string">&quot;program.sh&quot;</span>, <span class="hljs-number">1000</span>, <span class="hljs-number">1000</span>);<br><br><span class="hljs-comment">// 使用文件描述符</span><br>fchown(fd, <span class="hljs-number">1000</span>, <span class="hljs-number">1000</span>);<br></code></pre></td></tr></table></figure>
+
+<h2 id="truncate-ftruncate-截断文件"><a href="#truncate-ftruncate-截断文件" class="headerlink" title="truncate &#x2F; ftruncate - 截断文件"></a><code>truncate</code> &#x2F; <code>ftruncate</code> - 截断文件</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">truncate</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *path, <span class="hljs-type">off_t</span> length)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">ftruncate</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">off_t</span> length)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-8"><a href="#参数说明-8" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>path</code>: 文件路径（truncate）</li>
+<li><code>fd</code>: 文件描述符（ftruncate）</li>
+<li><code>length</code>: 新的文件长度（字节）</li>
+</ul>
+<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><ul>
+<li>如果当前文件大小 &gt; length，文件被截断到指定长度</li>
+<li>如果当前文件大小 &lt; length，文件被扩展（扩展部分填充为0）</li>
+</ul>
+<h3 id="返回值-8"><a href="#返回值-8" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-7"><a href="#示例-7" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 将文件截断到1024字节</span><br>truncate(<span class="hljs-string">&quot;large_file.txt&quot;</span>, <span class="hljs-number">1024</span>);<br><br><span class="hljs-comment">// 使用文件描述符截断</span><br>ftruncate(fd, <span class="hljs-number">512</span>);<br><br><span class="hljs-comment">// 清空文件内容</span><br>truncate(<span class="hljs-string">&quot;data.txt&quot;</span>, <span class="hljs-number">0</span>);<br></code></pre></td></tr></table></figure>
+
+<h2 id="mkdir-创建目录"><a href="#mkdir-创建目录" class="headerlink" title="mkdir - 创建目录"></a><code>mkdir</code> - 创建目录</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/stat.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">mkdir</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-type">mode_t</span> mode)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-9"><a href="#参数说明-9" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 要创建的目录路径</li>
+<li><code>mode</code>: 新目录的权限模式</li>
+</ul>
+<h3 id="返回值-9"><a href="#返回值-9" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="重要说明-2"><a href="#重要说明-2" class="headerlink" title="重要说明"></a>重要说明</h3><p><strong>目录权限计算</strong>：<code>mkdir()</code>创建的新目录权限会受到进程的umask影响，创建目录的实际权限为<code>(mode &amp; ~umask &amp; 0777)</code></p>
+<ul>
+<li><strong>其他模式位</strong>：除了权限位外，其他模式位是否生效取决于操作系统<br>w</li>
+</ul>
+<h3 id="示例-8"><a href="#示例-8" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 创建新目录，权限为0755</span><br><span class="hljs-comment">// 假设当前umask为0022，实际权限将是 0755 &amp; ~0022 &amp; 0777 = 0755</span><br><span class="hljs-keyword">if</span> (mkdir(<span class="hljs-string">&quot;new_directory&quot;</span>, <span class="hljs-number">0755</span>) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;mkdir&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 使用符号常量设置权限</span><br>mkdir(<span class="hljs-string">&quot;data_dir&quot;</span>, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);<br><br><span class="hljs-comment">// 临时修改umask再创建目录</span><br><span class="hljs-type">mode_t</span> old_umask = umask(<span class="hljs-number">0000</span>);  <span class="hljs-comment">// 临时取消umask限制</span><br>mkdir(<span class="hljs-string">&quot;full_access_dir&quot;</span>, <span class="hljs-number">0777</span>); <span class="hljs-comment">// 实际权限将是0777</span><br>umask(old_umask);               <span class="hljs-comment">// 恢复原来的umask</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="rmdir-删除空目录"><a href="#rmdir-删除空目录" class="headerlink" title="rmdir - 删除空目录"></a><code>rmdir</code> - 删除空目录</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">rmdir</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-10"><a href="#参数说明-10" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>pathname</code>: 要删除的空目录路径</li>
+</ul>
+<h3 id="返回值-10"><a href="#返回值-10" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>只能删除空目录</li>
+<li>不能删除当前工作目录或根目录</li>
+</ul>
+<h3 id="示例-9"><a href="#示例-9" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (rmdir(<span class="hljs-string">&quot;empty_directory&quot;</span>) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;rmdir&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="rename-重命名文件或目录"><a href="#rename-重命名文件或目录" class="headerlink" title="rename - 重命名文件或目录"></a><code>rename</code> - 重命名文件或目录</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">rename</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *oldpath, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *newpath)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-11"><a href="#参数说明-11" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>oldpath</code>: 原文件&#x2F;目录路径</li>
+<li><code>newpath</code>: 新文件&#x2F;目录路径</li>
+</ul>
+<h3 id="功能-1"><a href="#功能-1" class="headerlink" title="功能"></a>功能</h3><ul>
+<li>重命名文件或目录</li>
+<li>如果newpath已存在，会被替换</li>
+</ul>
+<h3 id="返回值-11"><a href="#返回值-11" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 重命名文件</span><br><span class="hljs-keyword">if</span> (rename(<span class="hljs-string">&quot;old_name.txt&quot;</span>, <span class="hljs-string">&quot;new_name.txt&quot;</span>) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;rename&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 移动文件到子目录</span><br>rename(<span class="hljs-string">&quot;data.txt&quot;</span>, <span class="hljs-string">&quot;backup/data.txt&quot;</span>);<br><br><span class="hljs-comment">// 重命名目录</span><br>rename(<span class="hljs-string">&quot;old_dir&quot;</span>, <span class="hljs-string">&quot;new_dir&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<h2 id="chdir-改变当前工作目录"><a href="#chdir-改变当前工作目录" class="headerlink" title="chdir - 改变当前工作目录"></a><code>chdir</code> - 改变当前工作目录</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">chdir</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *path)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-12"><a href="#参数说明-12" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>path</code>: 新的工作目录路径</li>
+</ul>
+<h3 id="返回值-12"><a href="#返回值-12" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="示例-11"><a href="#示例-11" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (chdir(<span class="hljs-string">&quot;/home/user/documents&quot;</span>) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;chdir&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="getcwd-获取当前工作目录"><a href="#getcwd-获取当前工作目录" class="headerlink" title="getcwd - 获取当前工作目录"></a><code>getcwd</code> - 获取当前工作目录</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">char</span> *<span class="hljs-title function_">getcwd</span><span class="hljs-params">(<span class="hljs-type">char</span> *buf, <span class="hljs-type">size_t</span> size)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-13"><a href="#参数说明-13" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>buf</code>: 存储路径的缓冲区</li>
+<li><code>size</code>: 缓区大小</li>
+</ul>
+<h3 id="返回值-13"><a href="#返回值-13" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回指向buf的指针</li>
+<li>失败：返回NULL，设置errno</li>
+</ul>
+<h3 id="使用注意事项"><a href="#使用注意事项" class="headerlink" title="使用注意事项"></a>使用注意事项</h3><ul>
+<li>buf必须足够大以存储完整路径</li>
+<li>路径长度可能受系统限制（PATH_MAX）</li>
+</ul>
+<h3 id="重要说明-3"><a href="#重要说明-3" class="headerlink" title="重要说明"></a>重要说明</h3><p><strong>glibc扩展</strong>：作为POSIX.1-2001标准的扩展，glibc的<code>getcwd()</code>函数支持动态分配缓冲区：</p>
+<ul>
+<li><strong>buf为NULL时</strong>：如果<code>buf</code>参数为NULL，glibc会使用<code>malloc()</code>动态分配缓冲区</li>
+<li><strong>自动确定大小</strong>：分配的缓冲区大小会根据实际路径长度确定，除非指定了<code>size</code>参数</li>
+<li><strong>内存管理</strong>：当使用动态分配时，调用者必须使用<code>free()</code>释放返回的缓冲区</li>
+<li><strong>size为零</strong>：如果<code>size</code>为零，缓冲区会分配为所需的大小</li>
+</ul>
+<h3 id="示例-12"><a href="#示例-12" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 方法1：使用固定大小缓冲区</span><br><span class="hljs-type">char</span> cwd[<span class="hljs-number">1024</span>];<br><span class="hljs-keyword">if</span> (getcwd(cwd, <span class="hljs-keyword">sizeof</span>(cwd)) != <span class="hljs-literal">NULL</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;当前工作目录: %s\n&quot;</span>, cwd);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    perror(<span class="hljs-string">&quot;getcwd&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 方法2：使用pathconf获取系统最大路径长度</span><br><span class="hljs-type">long</span> path_max = pathconf(<span class="hljs-string">&quot;.&quot;</span>, _PC_PATH_MAX);<br><span class="hljs-type">char</span> *buf = <span class="hljs-built_in">malloc</span>(path_max);<br><span class="hljs-keyword">if</span> (buf &amp;&amp; getcwd(buf, path_max)) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;当前工作目录: %s\n&quot;</span>, buf);<br>    <span class="hljs-built_in">free</span>(buf);<br>&#125;<br><br><span class="hljs-comment">// 方法3：使用glibc扩展（POSIX.1-2001标准扩展）</span><br><span class="hljs-type">char</span> *dynamic_buf = getcwd(<span class="hljs-literal">NULL</span>, <span class="hljs-number">0</span>);  <span class="hljs-comment">// 让glibc自动分配</span><br><span class="hljs-keyword">if</span> (dynamic_buf) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;当前工作目录: %s\n&quot;</span>, dynamic_buf);<br>    <span class="hljs-built_in">free</span>(dynamic_buf);  <span class="hljs-comment">// 必须释放</span><br>&#125;<br><br><span class="hljs-comment">// 方法4：指定大小，但让glibc分配</span><br><span class="hljs-type">char</span> *sized_buf = getcwd(<span class="hljs-literal">NULL</span>, <span class="hljs-number">4096</span>);  <span class="hljs-comment">// 分配4096字节</span><br><span class="hljs-keyword">if</span> (sized_buf) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;当前工作目录: %s\n&quot;</span>, sized_buf);<br>    <span class="hljs-built_in">free</span>(sized_buf);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="opendir-打开目录流"><a href="#opendir-打开目录流" class="headerlink" title="opendir - 打开目录流"></a><code>opendir</code> - 打开目录流</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;dirent.h&gt;</span></span><br><br>DIR *<span class="hljs-title function_">opendir</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *name)</span>;<br>DIR *<span class="hljs-title function_">fdopendir</span><span class="hljs-params">(<span class="hljs-type">int</span> fd)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-14"><a href="#参数说明-14" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>name</code>: 要打开的目录路径名（opendir）</li>
+<li><code>fd</code>: 已打开的目录文件描述符（fdopendir）</li>
+</ul>
+<h3 id="返回值-14"><a href="#返回值-14" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回指向目录流的指针</li>
+<li>失败：返回NULL，设置errno</li>
+</ul>
+<h3 id="功能说明"><a href="#功能说明" class="headerlink" title="功能说明"></a>功能说明</h3><p><code>opendir()</code>函数打开一个目录流，该目录流可用于后续的目录读取操作。目录流是一个有序的序列，包含目录中的所有目录项。</p>
+<h4 id="与open-的区别"><a href="#与open-的区别" class="headerlink" title="与open()的区别"></a>与open()的区别</h4><ul>
+<li><code>opendir()</code>专门用于读取目录内容，返回<code>DIR *</code>指针</li>
+<li><code>open()</code>用于文件I&#x2F;O操作，返回文件描述符</li>
+<li>目录流有内部状态，会记住当前位置</li>
+<li>文件描述符需要手动管理位置</li>
+</ul>
+<h4 id="fdopendir的特殊性"><a href="#fdopendir的特殊性" class="headerlink" title="fdopendir的特殊性"></a>fdopendir的特殊性</h4><p><code>fdopendir()</code> 函数接受一个已经打开的目录文件描述符，并将其转换为目录流：</p>
+<p><strong>重要注意事项：</strong></p>
+<ul>
+<li><strong>文件描述符所有权转移</strong>：当 <code>fdopendir()</code> 成功时，文件描述符的所有权转移给目录流</li>
+<li><strong>不要手动关闭</strong>：调用者<strong>不应该</strong>手动关闭传入的文件描述符，<code>closedir()</code> 会自动处理</li>
+<li><strong>重复关闭危险</strong>：如果在调用 <code>closedir()</code> 后再手动关闭文件描述符，会导致未定义行为</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> dir_fd = open(<span class="hljs-string">&quot;/home/user/documents&quot;</span>, O_RDONLY | O_DIRECTORY);<br><span class="hljs-keyword">if</span> (dir_fd == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;open&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 转换为目录流</span><br>DIR *dir = fdopendir(dir_fd);<br><span class="hljs-keyword">if</span> (dir == <span class="hljs-literal">NULL</span>) &#123;<br>    perror(<span class="hljs-string">&quot;fdopendir&quot;</span>);<br>    close(dir_fd);  <span class="hljs-comment">// 只有在fdopendir失败时才需要手动关闭</span><br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 使用目录流...</span><br><br><span class="hljs-comment">// 关闭目录流（会自动关闭dir_fd）</span><br>closedir(dir);<br><span class="hljs-comment">// 不要在这里调用 close(dir_fd)!</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="示例-13"><a href="#示例-13" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">DIR *dir = opendir(<span class="hljs-string">&quot;/home/user/documents&quot;</span>);<br><span class="hljs-keyword">if</span> (dir == <span class="hljs-literal">NULL</span>) &#123;<br>    perror(<span class="hljs-string">&quot;opendir&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 使用目录流进行操作...</span><br><br><span class="hljs-comment">// 记得关闭目录流</span><br>closedir(dir);<br></code></pre></td></tr></table></figure>
+
+<h2 id="readdir-读取目录项"><a href="#readdir-读取目录项" class="headerlink" title="readdir - 读取目录项"></a><code>readdir</code> - 读取目录项</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;dirent.h&gt;</span></span><br><br><span class="hljs-keyword">struct</span> dirent *<span class="hljs-title function_">readdir</span><span class="hljs-params">(DIR *dirp)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-15"><a href="#参数说明-15" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>dirp</code>: 目录流指针</li>
+</ul>
+<h3 id="返回值-15"><a href="#返回值-15" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回指向<code>struct dirent</code>的指针</li>
+<li>到达目录末尾：返回NULL（不设置errno）</li>
+<li>出错：返回NULL，设置errno</li>
+</ul>
+<h3 id="struct-dirent结构"><a href="#struct-dirent结构" class="headerlink" title="struct dirent结构"></a>struct dirent结构</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dirent</span> &#123;</span><br>    <span class="hljs-type">ino_t</span>      d_ino;       <span class="hljs-comment">// inode号</span><br>    <span class="hljs-type">off_t</span>      d_off;       <span class="hljs-comment">// 下一个目录项的偏移量</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> d_reclen; <span class="hljs-comment">// 本记录的长度</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>  d_type;   <span class="hljs-comment">// 文件类型</span><br>    <span class="hljs-type">char</span>       d_name[<span class="hljs-number">256</span>]; <span class="hljs-comment">// 文件名（以null结尾）</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="d-type字段说明"><a href="#d-type字段说明" class="headerlink" title="d_type字段说明"></a>d_type字段说明</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">DT_REG      <span class="hljs-comment">// 常规文件</span><br>DT_DIR      <span class="hljs-comment">// 目录</span><br>DT_LNK      <span class="hljs-comment">// 符号链接</span><br>DT_BLK      <span class="hljs-comment">// 块设备</span><br>DT_CHR      <span class="hljs-comment">// 字符设备</span><br>DT_FIFO     <span class="hljs-comment">// FIFO</span><br>DT_SOCK     <span class="hljs-comment">// 套接字</span><br>DT_UNKNOWN  <span class="hljs-comment">// 未知类型</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="重要注意事项"><a href="#重要注意事项" class="headerlink" title="重要注意事项"></a>重要注意事项</h3><h4 id="1-目录遍历顺序"><a href="#1-目录遍历顺序" class="headerlink" title="1. 目录遍历顺序"></a>1. 目录遍历顺序</h4><ul>
+<li>返回的目录项顺序由文件系统决定，通常不按字母顺序</li>
+<li>不要依赖特定的顺序</li>
+</ul>
+<h4 id="2-“-”和”-”目录项"><a href="#2-“-”和”-”目录项" class="headerlink" title="2. “.”和”..”目录项"></a>2. “.”和”..”目录项</h4><ul>
+<li>每个目录都包含”.”（当前目录）和”..”（父目录）两个特殊目录项</li>
+<li>根目录的”..”也指向根目录本身</li>
+</ul>
+<h4 id="3-文件名截断"><a href="#3-文件名截断" class="headerlink" title="3. 文件名截断"></a>3. 文件名截断</h4><ul>
+<li>文件名可能被截断以适应<code>d_name</code>数组大小</li>
+<li>在某些系统上，较长的文件名可能需要使用<code>pathconf()</code>获取最大长度</li>
+</ul>
+<h3 id="示例-14"><a href="#示例-14" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">list_directory</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *path)</span> &#123;<br>    DIR *dir;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dirent</span> *<span class="hljs-title">entry</span>;</span><br><br>    dir = opendir(path);<br>    <span class="hljs-keyword">if</span> (dir == <span class="hljs-literal">NULL</span>) &#123;<br>        perror(<span class="hljs-string">&quot;opendir&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;目录 %s 的内容:\n&quot;</span>, path);<br>    <span class="hljs-keyword">while</span> ((entry = readdir(dir)) != <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s&quot;</span>, entry-&gt;d_name);<br><br>        <span class="hljs-comment">// 根据d_type显示文件类型（如果支持）</span><br>        <span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> _DIRENT_HAVE_D_TYPE</span><br>        <span class="hljs-keyword">switch</span> (entry-&gt;d_type) &#123;<br>            <span class="hljs-keyword">case</span> DT_REG:<br>                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot; (文件)&quot;</span>); <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">case</span> DT_DIR:<br>                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot; (目录)&quot;</span>); <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">case</span> DT_LNK:<br>                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot; (符号链接)&quot;</span>); <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">default</span>:<br>                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot; (其他)&quot;</span>); <span class="hljs-keyword">break</span>;<br>        &#125;<br>        <span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>    &#125;<br><br>    closedir(dir);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="closedir-关闭目录流"><a href="#closedir-关闭目录流" class="headerlink" title="closedir - 关闭目录流"></a><code>closedir</code> - 关闭目录流</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;dirent.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">closedir</span><span class="hljs-params">(DIR *dirp)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="参数说明-16"><a href="#参数说明-16" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>dirp</code>: 要关闭的目录流指针</li>
+</ul>
+<h3 id="返回值-16"><a href="#返回值-16" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：返回0</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="功能说明-1"><a href="#功能说明-1" class="headerlink" title="功能说明"></a>功能说明</h3><p><code>closedir()</code>函数关闭目录流并释放相关资源。调用此函数后，<code>dirp</code>指针变为无效，不能再用于目录操作。</p>
+<h3 id="重要说明-4"><a href="#重要说明-4" class="headerlink" title="重要说明"></a>重要说明</h3><h4 id="1-资源管理"><a href="#1-资源管理" class="headerlink" title="1. 资源管理"></a>1. 资源管理</h4><ul>
+<li>必须为每个成功打开的目录流调用<code>closedir()</code></li>
+<li>忘记关闭目录流会导致文件描述符泄漏</li>
+</ul>
+<h4 id="2-底层文件描述符"><a href="#2-底层文件描述符" class="headerlink" title="2. 底层文件描述符"></a>2. 底层文件描述符</h4><ul>
+<li>目录流内部包含一个文件描述符</li>
+<li><code>closedir()</code>会自动关闭这个文件描述符</li>
+</ul>
+<h3 id="示例-15"><a href="#示例-15" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">safe_read_directory</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *path)</span> &#123;<br>    DIR *dir = opendir(path);<br>    <span class="hljs-keyword">if</span> (dir == <span class="hljs-literal">NULL</span>) &#123;<br>        perror(<span class="hljs-string">&quot;opendir&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dirent</span> *<span class="hljs-title">entry</span>;</span><br>    <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-keyword">while</span> ((entry = readdir(dir)) != <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-comment">// 跳过&quot;.&quot;和&quot;..&quot;</span><br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strcmp</span>(entry-&gt;d_name, <span class="hljs-string">&quot;.&quot;</span>) == <span class="hljs-number">0</span> ||<br>            <span class="hljs-built_in">strcmp</span>(entry-&gt;d_name, <span class="hljs-string">&quot;..&quot;</span>) == <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-keyword">continue</span>;<br>        &#125;<br><br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;找到文件: %s\n&quot;</span>, entry-&gt;d_name);<br>        count++;<br>    &#125;<br><br>    <span class="hljs-comment">// 必须关闭目录流</span><br>    <span class="hljs-keyword">if</span> (closedir(dir) == <span class="hljs-number">-1</span>) &#123;<br>        perror(<span class="hljs-string">&quot;closedir&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;总共找到 %d 个文件\n&quot;</span>, count);<br>    <span class="hljs-keyword">return</span> count;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="stat-fstat-lstat-获取文件状态"><a href="#stat-fstat-lstat-获取文件状态" class="headerlink" title="stat &#x2F; fstat &#x2F; lstat - 获取文件状态"></a><code>stat</code> &#x2F; <code>fstat</code> &#x2F; <code>lstat</code> - 获取文件状态</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/types.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/stat.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">stat</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-keyword">struct</span> stat *buf)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">fstat</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-keyword">struct</span> stat *buf)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">lstat</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *pathname, <span class="hljs-keyword">struct</span> stat *buf)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="区别-1"><a href="#区别-1" class="headerlink" title="区别"></a>区别</h3><ul>
+<li><code>stat</code>: 获取指定文件的状态信息</li>
+<li><code>fstat</code>: 获取文件描述符对应的文件状态信息</li>
+<li><code>lstat</code>: 类似stat，但不跟随符号链接</li>
+</ul>
+<h3 id="返回值-17"><a href="#返回值-17" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li><strong>成功</strong>: 返回0，并将文件状态信息填充到<code>struct stat *buf</code>指向的结构体中</li>
+<li><strong>失败</strong>: 返回-1，并设置errno</li>
+</ul>
+<h3 id="struct-stat结构"><a href="#struct-stat结构" class="headerlink" title="struct stat结构"></a>struct stat结构</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">stat</span> &#123;</span><br>    <span class="hljs-type">dev_t</span>     st_dev;     <span class="hljs-comment">// 设备ID</span><br>    <span class="hljs-type">ino_t</span>     st_ino;     <span class="hljs-comment">// inode号</span><br>    <span class="hljs-type">mode_t</span>    st_mode;    <span class="hljs-comment">// 文件类型和权限</span><br>    <span class="hljs-type">nlink_t</span>   st_nlink;   <span class="hljs-comment">// 硬链接数</span><br>    <span class="hljs-type">uid_t</span>     st_uid;     <span class="hljs-comment">// 所有者用户ID</span><br>    <span class="hljs-type">gid_t</span>     st_gid;     <span class="hljs-comment">// 所有者组ID</span><br>    <span class="hljs-type">dev_t</span>     st_rdev;    <span class="hljs-comment">// 设备ID（特殊文件）</span><br>    <span class="hljs-type">off_t</span>     st_size;    <span class="hljs-comment">// 文件大小（字节）</span><br>    <span class="hljs-type">blksize_t</span> st_blksize; <span class="hljs-comment">// 文件系统块大小</span><br>    <span class="hljs-type">blkcnt_t</span>  st_blocks;  <span class="hljs-comment">// 分配的块数</span><br>    <span class="hljs-type">time_t</span>    st_atime;   <span class="hljs-comment">// 最后访问时间</span><br>    <span class="hljs-type">time_t</span>    st_mtime;   <span class="hljs-comment">// 最后修改时间</span><br>    <span class="hljs-type">time_t</span>    st_ctime;   <span class="hljs-comment">// 最后状态改变时间</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="st-mode-文件类型和权限"><a href="#st-mode-文件类型和权限" class="headerlink" title="st_mode - 文件类型和权限"></a>st_mode - 文件类型和权限</h4><p><code>st_mode</code>字段包含两个重要信息：文件类型和访问权限。使用宏来检查这些信息：</p>
+<h5 id="文件类型宏-检查st-mode"><a href="#文件类型宏-检查st-mode" class="headerlink" title="文件类型宏 (检查st_mode)"></a>文件类型宏 (检查st_mode)</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">S_ISREG(mode)     <span class="hljs-comment">// 常规文件</span><br>S_ISDIR(mode)     <span class="hljs-comment">// 目录</span><br>S_ISCHR(mode)     <span class="hljs-comment">// 字符设备</span><br>S_ISBLK(mode)     <span class="hljs-comment">// 块设备</span><br>S_ISFIFO(mode)    <span class="hljs-comment">// FIFO（命名管道）</span><br>S_ISLNK(mode)     <span class="hljs-comment">// 符号链接</span><br>S_ISSOCK(mode)    <span class="hljs-comment">// 套接字</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="文件类型标志-在st-mode中"><a href="#文件类型标志-在st-mode中" class="headerlink" title="文件类型标志 (在st_mode中)"></a>文件类型标志 (在st_mode中)</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c">S_IFMT   <span class="hljs-number">0170000</span>   <span class="hljs-comment">// 文件类型位掩码</span><br>S_IFREG  <span class="hljs-number">0100000</span>   <span class="hljs-comment">// 常规文件</span><br>S_IFDIR  <span class="hljs-number">0040000</span>   <span class="hljs-comment">// 目录</span><br>S_IFCHR  <span class="hljs-number">0020000</span>   <span class="hljs-comment">// 字符设备</span><br>S_IFBLK  <span class="hljs-number">0060000</span>   <span class="hljs-comment">// 块设备</span><br>S_IFIFO  <span class="hljs-number">0010000</span>   <span class="hljs-comment">// FIFO</span><br>S_IFLNK  <span class="hljs-number">0120000</span>   <span class="hljs-comment">// 符号链接</span><br>S_IFSOCK <span class="hljs-number">0140000</span>   <span class="hljs-comment">// 套接字</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="访问权限标志-在st-mode中"><a href="#访问权限标志-在st-mode中" class="headerlink" title="访问权限标志 (在st_mode中)"></a>访问权限标志 (在st_mode中)</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 所有者权限</span><br>S_IRWXU  <span class="hljs-number">00700</span>   <span class="hljs-comment">// 所有者读、写、执行权限</span><br>S_IRUSR  <span class="hljs-number">00400</span>   <span class="hljs-comment">// 所有者读权限</span><br>S_IWUSR  <span class="hljs-number">00200</span>   <span class="hljs-comment">// 所有者写权限</span><br>S_IXUSR  <span class="hljs-number">00100</span>   <span class="hljs-comment">// 所有者执行权限</span><br><br><span class="hljs-comment">// 组权限</span><br>S_IRWXG  <span class="hljs-number">00070</span>   <span class="hljs-comment">// 组读、写、执行权限</span><br>S_IRGRP  <span class="hljs-number">00040</span>   <span class="hljs-comment">// 组读权限</span><br>S_IWGRP  <span class="hljs-number">00020</span>   <span class="hljs-comment">// 组写权限</span><br>S_IXGRP  <span class="hljs-number">00010</span>   <span class="hljs-comment">// 组执行权限</span><br><br><span class="hljs-comment">// 其他用户权限</span><br>S_IRWXO  <span class="hljs-number">00007</span>   <span class="hljs-comment">// 其他用户读、写、执行权限</span><br>S_IROTH  <span class="hljs-number">00004</span>   <span class="hljs-comment">// 其他用户读权限</span><br>S_IWOTH  <span class="hljs-number">00002</span>   <span class="hljs-comment">// 其他用户写权限</span><br>S_IXOTH  <span class="hljs-number">00001</span>   <span class="hljs-comment">// 其他用户执行权限</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="特殊权限位-在st-mode中"><a href="#特殊权限位-在st-mode中" class="headerlink" title="特殊权限位 (在st_mode中)"></a>特殊权限位 (在st_mode中)</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">S_ISUID  <span class="hljs-number">04000</span>   <span class="hljs-comment">// 设置用户ID位 (setuid)</span><br>S_ISGID  <span class="hljs-number">02000</span>   <span class="hljs-comment">// 设置组ID位 (setgid)</span><br>S_ISVTX  <span class="hljs-number">01000</span>   <span class="hljs-comment">// 粘着位 (sticky bit)</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="st-mode示例"><a href="#st-mode示例" class="headerlink" title="st_mode示例"></a>st_mode示例</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">stat</span> <span class="hljs-title">file_stat</span>;</span><br><span class="hljs-keyword">if</span> (stat(<span class="hljs-string">&quot;example.txt&quot;</span>, &amp;file_stat) == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-type">mode_t</span> mode = file_stat.st_mode;<br><br>    <span class="hljs-comment">// 检查文件类型</span><br>    <span class="hljs-keyword">if</span> (S_ISREG(mode)) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;常规文件\n&quot;</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (S_ISDIR(mode)) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;目录\n&quot;</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (S_ISLNK(mode)) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;符号链接\n&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 检查权限</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;所有者权限: &quot;</span>);<br>    <span class="hljs-keyword">if</span> (mode &amp; S_IRUSR) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;读 &quot;</span>);<br>    <span class="hljs-keyword">if</span> (mode &amp; S_IWUSR) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;写 &quot;</span>);<br>    <span class="hljs-keyword">if</span> (mode &amp; S_IXUSR) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;执行 &quot;</span>);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>    <span class="hljs-comment">// 检查特殊权限</span><br>    <span class="hljs-keyword">if</span> (mode &amp; S_ISUID) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;设置用户ID位\n&quot;</span>);<br>    <span class="hljs-keyword">if</span> (mode &amp; S_ISGID) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;设置组ID位\n&quot;</span>);<br>    <span class="hljs-keyword">if</span> (mode &amp; S_ISVTX) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;粘着位\n&quot;</span>);<br><br>    <span class="hljs-comment">// 以八进制显示权限</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;权限位: %o\n&quot;</span>, mode &amp; <span class="hljs-number">07777</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="示例-16"><a href="#示例-16" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">stat</span> <span class="hljs-title">file_stat</span>;</span><br><span class="hljs-keyword">if</span> (stat(<span class="hljs-string">&quot;example.txt&quot;</span>, &amp;file_stat) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;stat&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;文件大小: %ld 字节\n&quot;</span>, file_stat.st_size);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;最后修改时间: %s&quot;</span>, ctime(&amp;file_stat.st_mtime));<br></code></pre></td></tr></table></figure>
+
+<h2 id="dup-dup2-复制文件描述符"><a href="#dup-dup2-复制文件描述符" class="headerlink" title="dup &#x2F; dup2 - 复制文件描述符"></a><code>dup</code> &#x2F; <code>dup2</code> - 复制文件描述符</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">dup</span><span class="hljs-params">(<span class="hljs-type">int</span> oldfd)</span>;<br><span class="hljs-type">int</span> <span class="hljs-title function_">dup2</span><span class="hljs-params">(<span class="hljs-type">int</span> oldfd, <span class="hljs-type">int</span> newfd)</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="功能-2"><a href="#功能-2" class="headerlink" title="功能"></a>功能</h3><ul>
+<li><code>dup</code>: 复制文件描述符，返回新的最小可用文件描述符</li>
+<li><code>dup2</code>: 复制文件描述符到指定的文件描述符</li>
+</ul>
+<h3 id="参数说明-17"><a href="#参数说明-17" class="headerlink" title="参数说明"></a>参数说明</h3><ul>
+<li><code>oldfd</code>: 要复制的原始文件描述符</li>
+<li><code>newfd</code>: 目标文件描述符（仅用于dup2）</li>
+</ul>
+<h3 id="返回值-18"><a href="#返回值-18" class="headerlink" title="返回值"></a>返回值</h3><ul>
+<li>成功：<code>dup</code>返回新的文件描述符，<code>dup2</code>返回newfd</li>
+<li>失败：返回-1，设置errno</li>
+</ul>
+<h3 id="重要说明：文件描述符复制的底层机制"><a href="#重要说明：文件描述符复制的底层机制" class="headerlink" title="重要说明：文件描述符复制的底层机制"></a>重要说明：文件描述符复制的底层机制</h3><h4 id="共享打开文件描述"><a href="#共享打开文件描述" class="headerlink" title="共享打开文件描述"></a>共享打开文件描述</h4><p>复制后的文件描述符与原始文件描述符<strong>可以互换使用</strong>，因为它们指向同一个<strong>打开文件描述（open file description）</strong>：</p>
+<p><strong>共享的内容：</strong></p>
+<ul>
+<li><strong>文件偏移量</strong>：两个描述符共享相同的文件读写位置</li>
+<li><strong>文件状态标志</strong>：如<code>O_APPEND</code>、<code>O_NONBLOCK</code>等</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> fd1 = open(<span class="hljs-string">&quot;file.txt&quot;</span>, O_RDWR);<br><span class="hljs-type">int</span> fd2 = dup(fd1);<br><br><span class="hljs-comment">// 两个描述符共享文件偏移量</span><br>write(fd1, <span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-number">5</span>);     <span class="hljs-comment">// 写入5字节</span><br><span class="hljs-type">char</span> buf[<span class="hljs-number">10</span>];<br>lseek(fd2, <span class="hljs-number">0</span>, SEEK_SET);    <span class="hljs-comment">// 移动到文件开始</span><br>read(fd2, buf, <span class="hljs-number">5</span>);          <span class="hljs-comment">// 读取&quot;Hello&quot;</span><br><span class="hljs-comment">// 注意：lseek操作影响了fd1的文件位置</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="不共享文件描述符标志"><a href="#不共享文件描述符标志" class="headerlink" title="不共享文件描述符标志"></a>不共享文件描述符标志</h4><p>两个文件描述符<strong>不共享</strong>文件描述符级别的标志，最重要的是<strong>close-on-exec标志（FD_CLOEXEC）</strong>：</p>
+<ul>
+<li><strong>close-on-exec标志默认关闭</strong>：复制的新描述符的<code>FD_CLOEXEC</code>标志默认为关闭状态</li>
+<li>这意味着在<code>exec</code>系列函数执行新程序时，这个描述符不会被自动关闭</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> fd1 = open(<span class="hljs-string">&quot;file.txt&quot;</span>, O_RDWR);<br><span class="hljs-type">int</span> fd2 = dup(fd1);<br><br><span class="hljs-comment">// 检查close-on-exec标志</span><br><span class="hljs-type">int</span> flags1 = fcntl(fd1, F_GETFD);<br><span class="hljs-type">int</span> flags2 = fcntl(fd2, F_GETFD);<br><br><span class="hljs-comment">// flags2的FD_CLOEXEC位默认为0（关闭）</span><br><span class="hljs-comment">// flags1的FD_CLOEXEC位取决于系统默认值</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="原子性操作"><a href="#原子性操作" class="headerlink" title="原子性操作"></a>原子性操作</h4><p><code>dup2()</code>提供了原子性保证：</p>
+<ul>
+<li>如果<code>newfd</code>已经打开，<code>dup2()</code>会先关闭它</li>
+<li>这个操作是原子的，不会被信号中断</li>
+</ul>
+<h3 id="示例-17"><a href="#示例-17" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 示例1：标准输出重定向</span><br><span class="hljs-type">int</span> fd = open(<span class="hljs-string">&quot;output.txt&quot;</span>, O_WRONLY | O_CREAT | O_TRUNC, <span class="hljs-number">0644</span>);<br><span class="hljs-keyword">if</span> (fd == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;open&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 方法1：使用dup2（推荐，原子性）</span><br>dup2(fd, STDOUT_FILENO);<br><br><span class="hljs-comment">// 方法2：使用dup（非原子性）</span><br>close(STDOUT_FILENO);<br>dup(fd);<br>close(fd);  <span class="hljs-comment">// 原始fd可以关闭，因为dup2已经复制了</span><br><br><span class="hljs-comment">// 方法3：使用fcntl（更灵活）</span><br><span class="hljs-type">int</span> saved_stdout = dup(STDOUT_FILENO);  <span class="hljs-comment">// 保存原始stdout</span><br>dup2(fd, STDOUT_FILENO);<br><br><span class="hljs-comment">// 使用重定向后的stdout...</span><br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;这会写入到output.txt\n&quot;</span>);<br><br><span class="hljs-comment">// 恢复原始stdout</span><br>dup2(saved_stdout, STDOUT_FILENO);<br>close(saved_stdout);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 示例2：文件偏移量共享演示</span><br><span class="hljs-type">int</span> fd1 = open(<span class="hljs-string">&quot;data.txt&quot;</span>, O_RDWR | O_CREAT, <span class="hljs-number">0644</span>);<br><span class="hljs-keyword">if</span> (fd1 == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;open&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-type">int</span> fd2 = dup(fd1);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;fd1 = %d, fd2 = %d\n&quot;</span>, fd1, fd2);<br><br><span class="hljs-comment">// 写入数据到fd1</span><br>write(fd1, <span class="hljs-string">&quot;Hello, World!&quot;</span>, <span class="hljs-number">13</span>);<br><br><span class="hljs-comment">// 移动fd2的文件位置（会影响fd1）</span><br>lseek(fd2, <span class="hljs-number">0</span>, SEEK_SET);<br><br><span class="hljs-comment">// 从fd1读取（会从fd2设置的位置开始）</span><br><span class="hljs-type">char</span> buffer[<span class="hljs-number">20</span>];<br><span class="hljs-type">ssize_t</span> bytes = read(fd1, buffer, <span class="hljs-keyword">sizeof</span>(buffer) - <span class="hljs-number">1</span>);<br>buffer[bytes] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;从fd1读取: %s\n&quot;</span>, buffer);<br><br>close(fd1);<br>close(fd2);<br></code></pre></td></tr></table></figure>
+
+<h2 id="fcntl-文件控制操作"><a href="#fcntl-文件控制操作" class="headerlink" title="fcntl - 文件控制操作"></a><code>fcntl</code> - 文件控制操作</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">fcntl</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">int</span> cmd, ... <span class="hljs-comment">/* arg */</span> )</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">F_GETFL     <span class="hljs-comment">// 获取文件访问模式和状态标志</span><br>F_SETFL     <span class="hljs-comment">// 设置文件访问模式和状态标志</span><br>F_GETFD     <span class="hljs-comment">// 获取文件描述符标志</span><br>F_SETFD     <span class="hljs-comment">// 设置文件描述符标志</span><br>F_DUPFD     <span class="hljs-comment">// 复制文件描述符</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="示例-18"><a href="#示例-18" class="headerlink" title="示例"></a>示例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 获取文件状态标志</span><br><span class="hljs-type">int</span> flags = fcntl(fd, F_GETFL);<br><span class="hljs-keyword">if</span> (flags == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;fcntl&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br><br><span class="hljs-comment">// 设置非阻塞模式</span><br>flags |= O_NONBLOCK;<br><span class="hljs-keyword">if</span> (fcntl(fd, F_SETFL, flags) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">&quot;fcntl&quot;</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BC%96%E7%A8%8B/" class="category-chain-item">编程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C-C/" class="print-no-link">#C/C++</a>
+      
+        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+      
+        <a href="/tags/%E7%BC%96%E7%A8%8B/" class="print-no-link">#编程</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Linux系统编程</div>
+      <div>https://panmaru.github.io/2025/12/04/linux-programming/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Panmaru</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月4日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2025年12月4日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/11/25/static-and-shared-libraries-under-linux/" title="Linux下静态库、动态库">
+                        <span class="hidden-mobile">Linux下静态库、动态库</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"panmaru/panmaru.github.io","repo-id":"R_kgDOQcaWSw","category":"Announcements","category-id":"DIC_kwDOQcaWS84Cy-Tw","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
