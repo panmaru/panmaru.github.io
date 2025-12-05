@@ -6,7 +6,7 @@
   <link href="https://panmaru.github.io/atom.xml" rel="self"/>
   
   <link href="https://panmaru.github.io/"/>
-  <updated>2025-12-04T15:39:25.031Z</updated>
+  <updated>2025-12-05T14:59:33.071Z</updated>
   <id>https://panmaru.github.io/</id>
   
   <author>
@@ -15,6 +15,39 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用GDB调试多进程C程序</title>
+    <link href="https://panmaru.github.io/2025/12/05/gdb-debugging-multi-process-c-program/"/>
+    <id>https://panmaru.github.io/2025/12/05/gdb-debugging-multi-process-c-program/</id>
+    <published>2025-12-05T14:59:09.000Z</published>
+    <updated>2025-12-05T14:59:33.071Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h2><h3 id="follow-fork-mode"><a href="#follow-fork-mode" class="headerlink" title="follow-fork-mode"></a>follow-fork-mode</h3><p>通过<code>set follow-fork-mode mode</code>设置调试父进程或子进程，<code>mode</code>可以是：</p><ul><li><strong>parent</strong>  - fork后调试原始进程（默认值）</li><li><strong>child</strong>   - fork后调试新进程</li></ul><h3 id="detach-on-fork"><a href="#detach-on-fork" class="headerlink" title="detach-on-fork"></a>detach-on-fork</h3><p>若想随时切换调试不同的进程，使用<code>set detach-on-fork off</code>，这样设置后，GDB会同时跟踪所有进程。</p><h2 id="进程管理命令"><a href="#进程管理命令" class="headerlink" title="进程管理命令"></a>进程管理命令</h2><h3 id="查看所有进程"><a href="#查看所有进程" class="headerlink" title="查看所有进程"></a>查看所有进程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs gdb">(gdb) info inferiors<br>  Num  Description       Executable<br>* 1    process 1234      /home/user/program<br>  2    process 1235      /home/user/program<br>  3    process 1236      /home/user/program<br></code></pre></td></tr></table></figure><h3 id="切换进程"><a href="#切换进程" class="headerlink" title="切换进程"></a>切换进程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs gdb">(gdb) inferior 2<br>[Switching to inferior 2 [process 1235] (/home/user/program)]<br>#1  0x00007ffff7a64222 in __libc_fork () from /lib64/libc.so.6<br></code></pre></td></tr></table></figure><h3 id="附加-分离进程"><a href="#附加-分离进程" class="headerlink" title="附加&#x2F;分离进程"></a>附加&#x2F;分离进程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs gdb"># 附加到已存在的进程<br>(gdb) attach 12345<br><br># 分离当前进程<br>(gdb) detach<br><br># 分离指定的inferior而不删除<br>(gdb) detach-inferior 2<br><br># 删除inferior（进程退出后）<br>(gdb) remove-inferior 2<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;基本配置&quot;&gt;&lt;a href=&quot;#基本配置&quot; class=&quot;headerlink&quot; title=&quot;基本配置&quot;&gt;&lt;/a&gt;基本配置&lt;/h2&gt;&lt;h3 id=&quot;follow-fork-mode&quot;&gt;&lt;a href=&quot;#follow-fork-mode&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="编程" scheme="https://panmaru.github.io/categories/%E7%BC%96%E7%A8%8B/"/>
+    
+    
+    <category term="C/C++" scheme="https://panmaru.github.io/tags/C-C/"/>
+    
+    <category term="GDB" scheme="https://panmaru.github.io/tags/GDB/"/>
+    
+    <category term="调试" scheme="https://panmaru.github.io/tags/%E8%B0%83%E8%AF%95/"/>
+    
+    <category term="编程" scheme="https://panmaru.github.io/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>Linux系统编程</title>
@@ -41,9 +74,9 @@
     
     <category term="C/C++" scheme="https://panmaru.github.io/tags/C-C/"/>
     
-    <category term="Linux" scheme="https://panmaru.github.io/tags/Linux/"/>
-    
     <category term="编程" scheme="https://panmaru.github.io/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+    <category term="Linux" scheme="https://panmaru.github.io/tags/Linux/"/>
     
   </entry>
   
@@ -72,9 +105,9 @@
     
     <category term="C/C++" scheme="https://panmaru.github.io/tags/C-C/"/>
     
-    <category term="Linux" scheme="https://panmaru.github.io/tags/Linux/"/>
-    
     <category term="编程" scheme="https://panmaru.github.io/tags/%E7%BC%96%E7%A8%8B/"/>
+    
+    <category term="Linux" scheme="https://panmaru.github.io/tags/Linux/"/>
     
   </entry>
   
